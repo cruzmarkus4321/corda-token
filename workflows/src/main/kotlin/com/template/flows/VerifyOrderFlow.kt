@@ -28,32 +28,31 @@ class VerifyOrderFlow(private val reserveOrderId : String) : FlowFunctions()
         val partialTx = verifyAndSign(transaction())
         val otherPartySession = initiateFlow(stringToParty("Platform"))
         val transactionSignedByParties = subFlow(CollectSignaturesFlow(partialTx, listOf(otherPartySession)))
-        val fungibleToken = inputState().state.data.amount of TokenType("PHP") issuedBy ourIdentity heldBy ourIdentity
+
+        val reserveOrder = getReserveOrderByLinearId(reserveOrderId).state.data
+        //val fungibleToken = reserveOrder.amount of TokenType("PHP") issuedBy ourIdentity heldBy ourIdentity
 
         return subFlow(FinalityFlow(transactionSignedByParties, listOf(otherPartySession)))
-                .also { subFlow(IssueTokensFlow(fungibleToken, listOf()))}
-    }
-
-    private fun inputState() : StateAndRef<ReserveOrderState>
-    {
-        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(reserveOrderId)))
-        return serviceHub.vaultService.queryBy<ReserveOrderState>(queryCriteria).states.single()
     }
 
     private fun outputState() : ReserveOrderState
     {
-        return inputState().state.data.copy(status = Status.VERIFIED.Value,
-                verifiedAt = Instant.now())
+        val reserveOrder = getReserveOrderByLinearId(reserveOrderId).state.data
+        return reserveOrder.copy(
+                status = Status.VERIFIED.name,
+                verifiedAt = Instant.now()
+        )
     }
 
     private fun transaction() : TransactionBuilder
     {
+        val reserveOrder = getReserveOrderByLinearId(reserveOrderId).state.data
+        val reserveOrderRef = getReserveOrderByLinearId(reserveOrderId)
         val builder = TransactionBuilder(getNotaries())
-        val cmd = Command(ReserveOrderContract.Commands.Verify(), inputState().state.data.participants.map { it.owningKey })
-        builder.addInputState(inputState())
+        val cmd = Command(ReserveOrderContract.Commands.Verify(), reserveOrder.participants.map { it.owningKey })
+        builder.addInputState(reserveOrderRef)
         builder.addCommand(cmd)
         builder.addOutputState(outputState())
-
         return builder
     }
 

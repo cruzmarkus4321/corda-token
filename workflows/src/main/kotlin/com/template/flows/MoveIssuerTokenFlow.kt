@@ -16,7 +16,8 @@ import net.corda.core.identity.Party
 import net.corda.core.transactions.SignedTransaction
 
 @InitiatingFlow
-class MoveIssuerTokenFlow(private val holder: Party,
+class MoveIssuerTokenFlow(private val amount: Double,
+                          private val holder: Party,
                           private val otherHolder: Party): FlowFunctions() {
 
     @Suspendable
@@ -25,7 +26,7 @@ class MoveIssuerTokenFlow(private val holder: Party,
         val otherHolderSession = initiateFlow(otherHolder)
 
         return subFlow(MoveFungibleTokensFlow(
-                partyAndAmount = PartyAndAmount(otherHolder, 20 of TokenType("PHP")),
+                partyAndAmount = PartyAndAmount(otherHolder, amount of TokenType("PHP")),
                 queryCriteria = heldTokenAmountCriteria(TokenType("PHP"), holder),
                 participantSessions = listOf(holderSession, otherHolderSession),
                 observerSessions = emptyList<FlowSession>()

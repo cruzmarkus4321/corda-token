@@ -34,7 +34,7 @@ class SendTokenFlow(private val reserveOrderId : String): FlowFunctions() {
         val otherPartySession = initiateFlow(stringToParty("Platform"))
         val transactionSignedByParties = subFlow(CollectSignaturesFlow(partialTx, listOf(otherPartySession)))
 
-        subFlow(MoveIssuerTokenFlow(ourIdentity, stringToParty("Platform")))
+        subFlow(MoveIssuerTokenFlow(inputState().state.data.amount, ourIdentity, stringToParty("Platform")))
 
         return subFlow(FinalityFlow(transactionSignedByParties, listOf(otherPartySession)))
     }
@@ -46,7 +46,7 @@ class SendTokenFlow(private val reserveOrderId : String): FlowFunctions() {
     }
     private fun outputState() : ReserveOrderState
     {
-        return inputState().state.data.copy(status = Status.COMPLETED.Value,
+        return inputState().state.data.copy(status = Status.COMPLETED.name,
                 transferredAt = Instant.now())
     }
 

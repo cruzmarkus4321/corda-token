@@ -15,6 +15,7 @@ class UserContract: Contract{
     interface Commands: CommandData
     {
         class Add: TypeOnlyCommandData(), Commands
+        class Receive: TypeOnlyCommandData(), Commands
     }
 
 }

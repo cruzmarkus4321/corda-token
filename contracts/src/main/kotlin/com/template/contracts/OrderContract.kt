@@ -18,5 +18,6 @@ class OrderContract : Contract {
 
     interface Commands : CommandData {
         class Order : TypeOnlyCommandData(), Commands
+        class Transfer : TypeOnlyCommandData(), Commands
     }
 }

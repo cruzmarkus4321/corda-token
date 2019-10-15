@@ -4,6 +4,8 @@ import com.r3.corda.lib.tokens.contracts.utilities.of
 import com.r3.corda.lib.tokens.workflows.flows.move.MoveFungibleTokensFlow
 import com.r3.corda.lib.tokens.workflows.types.PartyAndAmount
 import com.r3.corda.lib.tokens.workflows.utilities.heldTokenAmountCriteria
+import com.template.states.OrderState
+import com.template.states.ReserveOrderState
 import com.template.states.UserState
 import com.template.types.TokenType
 import net.corda.core.contracts.Contract
@@ -47,6 +49,18 @@ abstract class FlowFunctions : FlowLogic<SignedTransaction>()
         return serviceHub.vaultService.queryBy<UserState>(queryCriteria).states.single()
     }
 
+    fun getOrdersByLinearId(linearId: String): StateAndRef<OrderState>
+    {
+        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(linearId)))
+        return serviceHub.vaultService.queryBy<OrderState>(queryCriteria).states.single()
+    }
+
+    fun getReserveOrderByLinearId(linearId: String) : StateAndRef<ReserveOrderState>
+    {
+        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(linearId)))
+        return serviceHub.vaultService.queryBy<ReserveOrderState>(queryCriteria).states.single()
+    }
+
     /*fun registerStateCountBit(): Boolean {
         val count = serviceHub.vaultService.queryBy<UserState>().states.count()
         return count != 0
@@ -67,10 +81,11 @@ abstract class FlowFunctions : FlowLogic<SignedTransaction>()
 
 
 
-    enum class Status(val Value: String) {
-        PENDING("PENDING"),
-        VERIFIED("VERIFIED"),
-        COMPLETED("COMPLETED")
+    enum class Status
+    {
+        PENDING,
+        VERIFIED,
+        COMPLETED
     }
 
 }
