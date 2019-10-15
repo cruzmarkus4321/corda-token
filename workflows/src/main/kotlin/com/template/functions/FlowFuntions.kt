@@ -1,11 +1,17 @@
 package com.template.functions
 
+import com.r3.corda.lib.tokens.contracts.utilities.of
+import com.r3.corda.lib.tokens.workflows.flows.move.MoveFungibleTokensFlow
+import com.r3.corda.lib.tokens.workflows.types.PartyAndAmount
+import com.r3.corda.lib.tokens.workflows.utilities.heldTokenAmountCriteria
 import com.template.states.UserState
+import com.template.types.TokenType
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.FlowLogic
+import net.corda.core.flows.FlowSession
 import net.corda.core.identity.Party
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
@@ -58,6 +64,8 @@ abstract class FlowFunctions : FlowLogic<SignedTransaction>()
     {
         return serviceHub.networkMapCache.notaryIdentities.first()
     }
+
+
 
     enum class Status(val Value: String) {
         PENDING("PENDING"),

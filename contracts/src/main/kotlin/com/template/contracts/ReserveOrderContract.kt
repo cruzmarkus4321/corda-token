@@ -18,5 +18,6 @@ class ReserveOrderContract : Contract {
     {
         class Reserve : TypeOnlyCommandData(), Commands
         class Verify : TypeOnlyCommandData(), Commands
+        class Send : TypeOnlyCommandData(), Commands
     }
 }
