@@ -9,8 +9,10 @@ import com.r3.corda.lib.tokens.workflows.flows.rpc.MoveFungibleTokensHandler
 import com.r3.corda.lib.tokens.workflows.types.PartyAndAmount
 import com.r3.corda.lib.tokens.workflows.utilities.heldTokenAmountCriteria
 import com.r3.corda.lib.tokens.workflows.utilities.tokenAmountWithIssuerCriteria
+import com.template.contracts.OrderContract
 import com.template.contracts.ReserveOrderContract
 import com.template.functions.FlowFunctions
+import com.template.states.OrderState
 import com.template.states.ReserveOrderState
 import com.template.types.TokenType
 import net.corda.core.contracts.Command
@@ -26,7 +28,7 @@ import java.time.Instant
 
 @InitiatingFlow
 @StartableByRPC
-class SendTokenFlow(private val reserveOrderId : String): FlowFunctions() {
+class SendTokenFlow(private val orderId : String): FlowFunctions() {
 
     @Suspendable
     override fun call(): SignedTransaction {
@@ -39,12 +41,12 @@ class SendTokenFlow(private val reserveOrderId : String): FlowFunctions() {
         return subFlow(FinalityFlow(transactionSignedByParties, listOf(otherPartySession)))
     }
 
-    private fun inputState() : StateAndRef<ReserveOrderState>
+    private fun inputState() : StateAndRef<OrderState>
     {
-        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(reserveOrderId)))
-        return serviceHub.vaultService.queryBy<ReserveOrderState>(queryCriteria).states.single()
+        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(orderId)))
+        return serviceHub.vaultService.queryBy<OrderState>(queryCriteria).states.single()
     }
-    private fun outputState() : ReserveOrderState
+    private fun outputState() : OrderState
     {
         return inputState().state.data.copy(status = Status.COMPLETED.name,
                 transferredAt = Instant.now())
@@ -53,7 +55,7 @@ class SendTokenFlow(private val reserveOrderId : String): FlowFunctions() {
     private fun transaction() : TransactionBuilder
     {
         val builder = TransactionBuilder(getNotaries())
-        val cmd = Command(ReserveOrderContract.Commands.Send(), outputState().participants.map { it.owningKey })
+        val cmd = Command(OrderContract.Commands.Send(), outputState().participants.map { it.owningKey })
         builder.addInputState(inputState())
         builder.addCommand(cmd)
         builder.addOutputState(outputState())

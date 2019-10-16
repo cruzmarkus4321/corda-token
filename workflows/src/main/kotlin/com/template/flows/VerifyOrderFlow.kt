@@ -5,8 +5,10 @@ import com.r3.corda.lib.tokens.contracts.utilities.heldBy
 import com.r3.corda.lib.tokens.contracts.utilities.issuedBy
 import com.r3.corda.lib.tokens.contracts.utilities.of
 import com.r3.corda.lib.tokens.workflows.flows.issue.IssueTokensFlow
+import com.template.contracts.OrderContract
 import com.template.contracts.ReserveOrderContract
 import com.template.functions.FlowFunctions
+import com.template.states.OrderState
 import com.template.states.ReserveOrderState
 import com.template.types.TokenType
 import net.corda.core.contracts.Command
@@ -21,7 +23,7 @@ import java.time.Instant
 
 @InitiatingFlow
 @StartableByRPC
-class VerifyOrderFlow(private val reserveOrderId : String) : FlowFunctions()
+class VerifyOrderFlow(private val orderId: String) : FlowFunctions()
 {
     @Suspendable
     override fun call(): SignedTransaction {
@@ -29,15 +31,15 @@ class VerifyOrderFlow(private val reserveOrderId : String) : FlowFunctions()
         val otherPartySession = initiateFlow(stringToParty("Platform"))
         val transactionSignedByParties = subFlow(CollectSignaturesFlow(partialTx, listOf(otherPartySession)))
 
-        val reserveOrder = getReserveOrderByLinearId(reserveOrderId).state.data
+        val reserveOrder = getOrderByLinearId(orderId).state.data
         //val fungibleToken = reserveOrder.amount of TokenType("PHP") issuedBy ourIdentity heldBy ourIdentity
 
         return subFlow(FinalityFlow(transactionSignedByParties, listOf(otherPartySession)))
     }
 
-    private fun outputState() : ReserveOrderState
+    private fun outputState() : OrderState
     {
-        val reserveOrder = getReserveOrderByLinearId(reserveOrderId).state.data
+        val reserveOrder = getOrderByLinearId(orderId).state.data
         return reserveOrder.copy(
                 status = Status.VERIFIED.name,
                 verifiedAt = Instant.now()
@@ -46,10 +48,10 @@ class VerifyOrderFlow(private val reserveOrderId : String) : FlowFunctions()
 
     private fun transaction() : TransactionBuilder
     {
-        val reserveOrder = getReserveOrderByLinearId(reserveOrderId).state.data
-        val reserveOrderRef = getReserveOrderByLinearId(reserveOrderId)
+        val reserveOrder = getOrderByLinearId(orderId).state.data
+        val reserveOrderRef = getOrderByLinearId(orderId)
         val builder = TransactionBuilder(getNotaries())
-        val cmd = Command(ReserveOrderContract.Commands.Verify(), reserveOrder.participants.map { it.owningKey })
+        val cmd = Command(OrderContract.Commands.Verify(), reserveOrder.participants.map { it.owningKey })
         builder.addInputState(reserveOrderRef)
         builder.addCommand(cmd)
         builder.addOutputState(outputState())

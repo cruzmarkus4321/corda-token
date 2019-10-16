@@ -49,16 +49,10 @@ abstract class FlowFunctions : FlowLogic<SignedTransaction>()
         return serviceHub.vaultService.queryBy<UserState>(queryCriteria).states.single()
     }
 
-    fun getOrdersByLinearId(linearId: String): StateAndRef<OrderState>
+    fun getOrderByLinearId(linearId: String) : StateAndRef<OrderState>
     {
         val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(linearId)))
         return serviceHub.vaultService.queryBy<OrderState>(queryCriteria).states.single()
-    }
-
-    fun getReserveOrderByLinearId(linearId: String) : StateAndRef<ReserveOrderState>
-    {
-        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(linearId)))
-        return serviceHub.vaultService.queryBy<ReserveOrderState>(queryCriteria).states.single()
     }
 
     /*fun registerStateCountBit(): Boolean {
