@@ -1,70 +1,56 @@
-/*
 package com.template.flows
 
 import co.paralleluniverse.fibers.Suspendable
-import com.template.contracts.OrderContract
-import com.template.contracts.UserContract
+import com.r3.corda.lib.tokens.contracts.utilities.of
+import com.r3.corda.lib.tokens.workflows.flows.rpc.RedeemFungibleTokens
+import com.r3.corda.lib.tokens.workflows.utilities.heldTokenAmountCriteria
+import com.template.contracts.ReserveOrderContract
 import com.template.functions.FlowFunctions
 import com.template.states.OrderState
-import com.template.states.UserState
+import com.template.states.ReserveOrderState
+import com.template.types.TokenType
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.StateAndRef
+import net.corda.core.flows.FinalityFlow
 import net.corda.core.flows.StartableByRPC
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
+import org.hibernate.Transaction
 import java.time.Instant
 
 @StartableByRPC
-class TransferTokenFlow: FlowFunctions(){
+class TransferTokenFlow(private val reserveOrderId: String): FlowFunctions(){
 
     @Suspendable
     override fun call(): SignedTransaction {
-        TODO()
+        subFlow(TransferTokenToWalletFlow(reserveOrderId))
+
+        return subFlow(FinalityFlow(verifyAndSign(transaction(reserveOrderId)), listOf()))
     }
 
-    private fun getAllOrderFromVault()
+    private fun inputState(reserveOrderId: String): StateAndRef<ReserveOrderState>
     {
-        val order = getOrdersByLinearId()
+        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(reserveOrderId)))
+        return serviceHub.vaultService.queryBy<ReserveOrderState>(queryCriteria).states.single()
     }
 
-    private fun inOrderState(orderId: String): StateAndRef<OrderState>{
-        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(orderId)))
-        return serviceHub.vaultService.queryBy<OrderState>(queryCriteria).states.single()
+    private fun outputState(reserveOrderId: String): ReserveOrderState
+    {
+        val reserveStateData = inputState(reserveOrderId).state.data
+
+        return reserveStateData.copy(transferredAt = Instant.now())
     }
 
-    private fun inUserState(userId: String): StateAndRef<UserState>{
-        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(userId)))
-        return serviceHub.vaultService.queryBy<UserState>(queryCriteria).states.single()
-    }
-
-    private fun outOrderState(state: StateAndRef<OrderState>): OrderState{
-        return state.state.data.copy(transferredAt = Instant.now())
-    }
-
-    private fun outUserState(state: StateAndRef<UserState>, amount: String, currency: String): UserState{
-        val wallet = state.state.data.wallet
-
-        forEach
-
-        return state.state.data.copy(
-                wallet = )
-        )
-    }
-
-    private fun transaction(orderId: String): TransactionBuilder {
+    private fun transaction(reserveOrderId: String): TransactionBuilder
+    {
+        val cmd = Command(ReserveOrderContract.Commands.Transfer(), ourIdentity.owningKey)
         val builder = TransactionBuilder(getNotaries())
-        val transferCmd = Command(OrderContract.Commands.Transfer(), ourIdentity.owningKey)
-        val receiveCmd = Command(UserContract.Commands.Receive(), ourIdentity.owningKey)
-        builder.addInputState(inOrderState(orderId))
-                .addCommand(transferCmd)
-                .addOutputState(outOrderState(inOrderState(orderId)))
-        builder.addInputState(inUserState(inOrderState(orderId).state.data.userId))
-                .addCommand(receiveCmd)
-                .addOutputState(outUserState(inUserState(inOrderState(orderId).state.data.userId)))
+                .addInputState(inputState(reserveOrderId))
+                .addCommand(cmd)
+                .addOutputState(outputState(reserveOrderId))
 
         return builder
     }
 }
-*/

@@ -73,8 +73,6 @@ abstract class FlowFunctions : FlowLogic<SignedTransaction>()
         return serviceHub.networkMapCache.notaryIdentities.first()
     }
 
-
-
     enum class Status
     {
         PENDING,
