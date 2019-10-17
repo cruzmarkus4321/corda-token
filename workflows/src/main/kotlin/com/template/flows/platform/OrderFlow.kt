@@ -1,11 +1,9 @@
-package com.template.flows
+package com.template.flows.platform
 
 import co.paralleluniverse.fibers.Suspendable
 import com.template.contracts.OrderContract
-import com.template.contracts.ReserveOrderContract
 import com.template.functions.FlowFunctions
 import com.template.states.OrderState
-import com.template.states.ReserveOrderState
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.contracts.requireThat
@@ -22,18 +20,15 @@ class OrderFlow(private val amount : Double,
     private val tokenIssuer: String = when (currency) {
         "PHP" -> "IssuerPHP"
         "USD" -> "IssuerUSD"
-        else -> throw IllegalStateException("Unsupported currency.")
+        else -> throw IllegalArgumentException("Unsupported currency.")
     }
 
     @Suspendable
     override fun call(): SignedTransaction
     {
-
-
         val partialTx = verifyAndSign(transaction())
         val otherPartySession = initiateFlow(stringToParty(tokenIssuer))
         val transactionSignedByParties = subFlow(CollectSignaturesFlow(partialTx, listOf(otherPartySession)))
-
         return subFlow(FinalityFlow(transactionSignedByParties, listOf(otherPartySession)))
     }
 

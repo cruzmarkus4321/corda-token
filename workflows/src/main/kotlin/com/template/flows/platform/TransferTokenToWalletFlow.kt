@@ -1,4 +1,4 @@
-package com.template.flows
+package com.template.flows.platform
 
 import co.paralleluniverse.fibers.Suspendable
 import com.r3.corda.lib.tokens.contracts.types.TokenType
@@ -11,7 +11,6 @@ import net.corda.core.contracts.Amount
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.flows.FinalityFlow
-import net.corda.core.flows.StartableByRPC
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction

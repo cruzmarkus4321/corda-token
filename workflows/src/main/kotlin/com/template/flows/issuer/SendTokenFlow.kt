@@ -1,26 +1,13 @@
-package com.template.flows
+package com.template.flows.issuer
 
 import co.paralleluniverse.fibers.Suspendable
-import com.r3.corda.lib.tokens.contracts.states.FungibleToken
-import com.r3.corda.lib.tokens.contracts.utilities.of
-import com.r3.corda.lib.tokens.workflows.flows.move.MoveFungibleTokensFlow
-import com.r3.corda.lib.tokens.workflows.flows.move.MoveTokensFlowHandler
-import com.r3.corda.lib.tokens.workflows.flows.rpc.MoveFungibleTokens
-import com.r3.corda.lib.tokens.workflows.flows.rpc.MoveFungibleTokensHandler
-import com.r3.corda.lib.tokens.workflows.types.PartyAndAmount
-import com.r3.corda.lib.tokens.workflows.utilities.heldTokenAmountCriteria
-import com.r3.corda.lib.tokens.workflows.utilities.tokenAmountWithIssuerCriteria
 import com.template.contracts.OrderContract
-import com.template.contracts.ReserveOrderContract
 import com.template.functions.FlowFunctions
 import com.template.states.OrderState
-import com.template.states.ReserveOrderState
-import com.template.types.TokenType
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
-import net.corda.core.identity.Party
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction

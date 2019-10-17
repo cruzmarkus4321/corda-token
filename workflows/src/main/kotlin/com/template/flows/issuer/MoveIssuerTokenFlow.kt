@@ -1,4 +1,4 @@
-package com.template.flows
+package com.template.flows.issuer
 
 import co.paralleluniverse.fibers.Suspendable
 import com.r3.corda.lib.tokens.contracts.states.FungibleToken
@@ -9,7 +9,6 @@ import com.r3.corda.lib.tokens.workflows.types.PartyAndAmount
 import com.r3.corda.lib.tokens.workflows.utilities.heldTokenAmountCriteria
 import com.template.functions.FlowFunctions
 import com.template.types.TokenType
-import net.corda.core.contracts.StateAndRef
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.FlowSession
 import net.corda.core.flows.InitiatedBy
@@ -40,7 +39,7 @@ class MoveIssuerTokenFlow(private val amount: Double,
                     partyAndAmount = PartyAndAmount(otherHolder, amount of TokenType(tokenIdentifier)),
                     queryCriteria = heldTokenAmountCriteria(TokenType(tokenIdentifier), holder),
                     participantSessions = listOf(holderSession, otherHolderSession),
-                    observerSessions = emptyList<FlowSession>()
+                    observerSessions = emptyList()
             ))
         } else {
             throw IllegalArgumentException("Insufficient $tokenIdentifier.")
@@ -49,7 +48,7 @@ class MoveIssuerTokenFlow(private val amount: Double,
 
     private fun getTokenAmount(currency: String) : Double
     {
-        val queryCriteria = heldTokenAmountCriteria(com.template.types.TokenType(currency), holder = ourIdentity)
+        val queryCriteria = heldTokenAmountCriteria(TokenType(currency), holder = ourIdentity)
         return serviceHub.vaultService.queryBy<FungibleToken>(queryCriteria).states.single().state.data.amount.quantity.toDouble()
     }
 }

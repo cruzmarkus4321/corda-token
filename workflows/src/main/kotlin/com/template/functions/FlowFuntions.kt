@@ -15,6 +15,7 @@ import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.FlowSession
 import net.corda.core.identity.Party
+import net.corda.core.node.services.Vault
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
@@ -51,7 +52,7 @@ abstract class FlowFunctions : FlowLogic<SignedTransaction>()
 
     fun getOrderByLinearId(linearId: String) : StateAndRef<OrderState>
     {
-        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(linearId)))
+        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(linearId)), status = Vault.StateStatus.ALL)
         return serviceHub.vaultService.queryBy<OrderState>(queryCriteria).states.single()
     }
 

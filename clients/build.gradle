@@ -24,24 +24,43 @@ dependencies {
         exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
     }
 
+    //Swagger
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.7.0'
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'
+
     // Logging.
     compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
     compile "org.apache.logging.log4j:log4j-web:${log4j_version}"
     compile "org.slf4j:jul-to-slf4j:$slf4j_version"
+
+    // Jackson
+    compile "net.corda:corda-jackson:$corda_release_version"
 }
 
 springBoot {
-    mainClassName = "com.template.webserver.ServerKt"
+    mainClassName = "token.webserver.ServerKt"
 }
 
 task runTemplateClient(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
-    main = 'com.template.ClientKt'
+    main = 'token.ClientKt'
     args 'localhost:10006', 'user1', 'test'
 }
 
-task runTemplateServer(type: JavaExec) {
+//task runTemplateServer(type: JavaExec) {
+//    classpath = sourceSets.main.runtimeClasspath
+//    main = 'com.template.webserver.ServerKt'
+//    args '--server.port=10050', '--config.rpc.host=localhost', '--config.rpc.port=10006', '--config.rpc.username=user1', '--config.rpc.password=test'
+//}
+
+task runPlatformServer(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
-    main = 'com.template.webserver.ServerKt'
-    args '--server.port=10050', '--config.rpc.host=localhost', '--config.rpc.port=10006', '--config.rpc.username=user1', '--config.rpc.password=test'
+    main = 'token.webserver.ServerKt'
+    args '--server.port=9090', '--config.rpc.host=localhost', '--config.rpc.port=10006', '--config.rpc.username=user1', '--config.rpc.password=test'
+}
+
+task runIssuerPHPServer(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'token.webserver.ServerKt'
+    args '--server.port=9091', '--config.rpc.host=localhost', '--config.rpc.port=10009', '--config.rpc.username=user1', '--config.rpc.password=test'
 }

@@ -1,4 +1,4 @@
-package com.template.flows
+package com.template.flows.issuer
 
 import com.r3.corda.lib.tokens.contracts.utilities.heldBy
 import com.r3.corda.lib.tokens.contracts.utilities.issuedBy
@@ -10,7 +10,8 @@ import net.corda.core.flows.StartableByRPC
 import net.corda.core.transactions.SignedTransaction
 
 @StartableByRPC
-class SelfIssueTokenFlow(private val amount: Double): FlowFunctions(){
+class SelfIssueTokenFlow(private val amount: Double): FlowFunctions()
+{
     override fun call(): SignedTransaction {
 
         val tokenIdentifier = when (ourIdentity.name.organisation) {

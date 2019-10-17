@@ -1,4 +1,4 @@
-package com.template.flows
+package com.template.flows.user
 
 import co.paralleluniverse.fibers.Suspendable
 import com.template.contracts.OrderContract
@@ -15,8 +15,8 @@ import java.time.Instant
 
 @StartableByRPC
 class ReserveOrderFlow(private val userId: String,
-                private val amount: Double,
-                private val currency: String) : FlowFunctions()
+                       private val amount: Double,
+                       private val currency: String) : FlowFunctions()
 {
     @Suspendable
     override fun call(): SignedTransaction

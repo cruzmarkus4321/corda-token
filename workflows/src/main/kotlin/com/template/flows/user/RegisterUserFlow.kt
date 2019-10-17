@@ -1,4 +1,4 @@
-package com.template.flows
+package com.template.flows.user
 
 import com.r3.corda.lib.tokens.contracts.types.TokenType
 import com.r3.corda.lib.tokens.contracts.utilities.of
@@ -39,7 +39,7 @@ class RegisterUserFlow(private val name: String,
         }
 
         moneyMap.forEach { (tokenName, amount) ->
-            moneyList.add(amount of TokenType("$tokenName", 2))
+            moneyList.add(amount of TokenType(tokenName, 2))
         }
 
         return UserState(

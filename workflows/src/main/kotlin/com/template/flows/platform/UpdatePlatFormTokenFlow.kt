@@ -1,20 +1,16 @@
-package com.template.flows
+package com.template.flows.platform
 
 import co.paralleluniverse.fibers.Suspendable
-import com.r3.corda.lib.tokens.contracts.states.AbstractToken
 import com.r3.corda.lib.tokens.contracts.states.FungibleToken
 import com.r3.corda.lib.tokens.contracts.utilities.heldBy
 import com.r3.corda.lib.tokens.contracts.utilities.issuedBy
 import com.r3.corda.lib.tokens.contracts.utilities.of
-import com.r3.corda.lib.tokens.workflows.flows.move.MoveTokensFlow
 import com.r3.corda.lib.tokens.workflows.flows.rpc.RedeemFungibleTokens
 import com.r3.corda.lib.tokens.workflows.utilities.heldTokenAmountCriteria
 import com.template.functions.FlowFunctions
 import com.template.states.ReserveOrderState
 import com.template.types.TokenType
 import net.corda.core.contracts.StateAndRef
-import net.corda.core.flows.InitiatingFlow
-import net.corda.core.flows.StartableByRPC
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
@@ -29,7 +25,7 @@ class UpdatePlatFormTokenFlow(private val reserveOrderId : String) : FlowFunctio
                             amount = getReserveOrder().amount of output(getReserveOrder().currency).tokenType,
                             issuer = input(getReserveOrder().currency).state.data.issuer,
                             observers = listOf(),
-                            queryCriteria = heldTokenAmountCriteria(com.template.types.TokenType(getReserveOrder().currency), holder = ourIdentity)
+                            queryCriteria = heldTokenAmountCriteria(TokenType(getReserveOrder().currency), holder = ourIdentity)
                     )
             )
         } else {
@@ -39,7 +35,7 @@ class UpdatePlatFormTokenFlow(private val reserveOrderId : String) : FlowFunctio
 
     private fun input(currency : String) : StateAndRef<FungibleToken>
     {
-        val queryCriteria = heldTokenAmountCriteria(com.template.types.TokenType(currency), holder = ourIdentity)
+        val queryCriteria = heldTokenAmountCriteria(TokenType(currency), holder = ourIdentity)
         return serviceHub.vaultService.queryBy<FungibleToken>(queryCriteria).states.single()
     }
 
