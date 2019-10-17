@@ -13,6 +13,7 @@ import net.corda.core.flows.FinalityFlow
 import net.corda.core.flows.StartableByRPC
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
+import java.lang.IllegalStateException
 import java.time.Instant
 
 @StartableByRPC
@@ -22,7 +23,9 @@ class RegisterUserFlow(private val name: String,
 {
     override fun call(): SignedTransaction
     {
-        return subFlow(FinalityFlow(verifyAndSign(transaction()), listOf()))
+        if(ourIdentity.name.organisation == "Platform")
+            return subFlow(FinalityFlow(verifyAndSign(transaction()), listOf()))
+        else throw IllegalStateException("You are not allowed to use this flow!")
     }
 
     private fun userState(): UserState
