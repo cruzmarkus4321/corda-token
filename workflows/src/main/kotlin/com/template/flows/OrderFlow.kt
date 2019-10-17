@@ -19,12 +19,19 @@ import java.time.Instant
 class OrderFlow(private val amount : Double,
                 private val currency: String) : FlowFunctions()
 {
+    private val tokenIssuer: String = when (currency) {
+        "PHP" -> "IssuerPHP"
+        "USD" -> "IssuerUSD"
+        else -> throw IllegalStateException("Unsupported currency.")
+    }
 
     @Suspendable
     override fun call(): SignedTransaction
     {
+
+
         val partialTx = verifyAndSign(transaction())
-        val otherPartySession = initiateFlow(stringToParty("IssuerPHP"))
+        val otherPartySession = initiateFlow(stringToParty(tokenIssuer))
         val transactionSignedByParties = subFlow(CollectSignaturesFlow(partialTx, listOf(otherPartySession)))
 
         return subFlow(FinalityFlow(transactionSignedByParties, listOf(otherPartySession)))
@@ -40,7 +47,7 @@ class OrderFlow(private val amount : Double,
                 verifiedAt = null,
                 transferredAt = null,
                 linearId = UniqueIdentifier(),
-                participants = listOf(ourIdentity, stringToParty("IssuerPHP"))
+                participants = listOf(ourIdentity, stringToParty(tokenIssuer))
         )
     }
 

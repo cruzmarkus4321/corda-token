@@ -25,9 +25,15 @@ class MoveIssuerTokenFlow(private val amount: Double,
         val holderSession = initiateFlow(holder)
         val otherHolderSession = initiateFlow(otherHolder)
 
+        val tokenIdentifier = when (holder.name.organisation) {
+            "IssuerPHP" -> "PHP"
+            "IssuerUSD" -> "USD"
+            else -> throw IllegalStateException("Only the Issuers can issue tokens.")
+        }
+
         return subFlow(MoveFungibleTokensFlow(
-                partyAndAmount = PartyAndAmount(otherHolder, amount of TokenType("PHP")),
-                queryCriteria = heldTokenAmountCriteria(TokenType("PHP"), holder),
+                partyAndAmount = PartyAndAmount(otherHolder, amount of TokenType(tokenIdentifier)),
+                queryCriteria = heldTokenAmountCriteria(TokenType(tokenIdentifier), holder),
                 participantSessions = listOf(holderSession, otherHolderSession),
                 observerSessions = emptyList<FlowSession>()
         ))

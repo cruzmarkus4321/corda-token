@@ -25,6 +25,8 @@ class TransferTokenFlow(private val reserveOrderId: String): FlowFunctions(){
 
     @Suspendable
     override fun call(): SignedTransaction {
+        subFlow(UpdatePlatFormTokenFlow(reserveOrderId))
+
         subFlow(TransferTokenToWalletFlow(reserveOrderId))
 
         return subFlow(FinalityFlow(verifyAndSign(transaction(reserveOrderId)), listOf()))

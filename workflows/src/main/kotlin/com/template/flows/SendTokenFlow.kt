@@ -37,7 +37,6 @@ class SendTokenFlow(private val orderId : String): FlowFunctions() {
         val transactionSignedByParties = subFlow(CollectSignaturesFlow(partialTx, listOf(otherPartySession)))
 
         subFlow(MoveIssuerTokenFlow(inputState().state.data.amount, ourIdentity, stringToParty("Platform")))
-        subFlow(MoveIssuerTokenFlow(inputState().state.data.amount, ourIdentity, stringToParty("Platform")))
 
         return subFlow(FinalityFlow(transactionSignedByParties, listOf(otherPartySession)))
     }

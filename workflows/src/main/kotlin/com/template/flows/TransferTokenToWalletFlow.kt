@@ -17,7 +17,6 @@ import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 
-@StartableByRPC
 class TransferTokenToWalletFlow(private val reserveOrderId: String): FlowFunctions(){
     @Suspendable
     override fun call(): SignedTransaction {
