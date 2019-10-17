@@ -1,6 +1,7 @@
 package com.template.flows
 
 import co.paralleluniverse.fibers.Suspendable
+import com.r3.corda.lib.tokens.contracts.states.FungibleToken
 import com.r3.corda.lib.tokens.contracts.utilities.of
 import com.r3.corda.lib.tokens.workflows.flows.move.MoveFungibleTokensFlow
 import com.r3.corda.lib.tokens.workflows.flows.move.MoveTokensFlowHandler
@@ -24,6 +25,7 @@ import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
+import java.lang.IllegalArgumentException
 import java.time.Instant
 
 @InitiatingFlow
@@ -36,9 +38,15 @@ class SendTokenFlow(private val orderId : String): FlowFunctions() {
         val otherPartySession = initiateFlow(stringToParty("Platform"))
         val transactionSignedByParties = subFlow(CollectSignaturesFlow(partialTx, listOf(otherPartySession)))
 
-        subFlow(MoveIssuerTokenFlow(inputState().state.data.amount, ourIdentity, stringToParty("Platform")))
+        val orderStatus = inputState().state.data.status
 
-        return subFlow(FinalityFlow(transactionSignedByParties, listOf(otherPartySession)))
+        return if(orderStatus == "VERIFIED") {
+            subFlow(MoveIssuerTokenFlow(inputState().state.data.amount, ourIdentity, stringToParty("Platform")))
+
+            subFlow(FinalityFlow(transactionSignedByParties, listOf(otherPartySession)))
+        } else {
+            throw IllegalArgumentException("Order must be verified first.")
+        }
     }
 
     private fun inputState() : StateAndRef<OrderState>

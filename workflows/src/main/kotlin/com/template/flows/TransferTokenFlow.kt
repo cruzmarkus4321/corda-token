@@ -18,6 +18,7 @@ import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import org.hibernate.Transaction
+import java.lang.IllegalArgumentException
 import java.time.Instant
 
 @StartableByRPC
@@ -25,11 +26,15 @@ class TransferTokenFlow(private val reserveOrderId: String): FlowFunctions(){
 
     @Suspendable
     override fun call(): SignedTransaction {
-        subFlow(UpdatePlatFormTokenFlow(reserveOrderId))
+        return if(inputState(reserveOrderId).state.data.transferredAt == null){
+            subFlow(UpdatePlatFormTokenFlow(reserveOrderId))
 
-        subFlow(TransferTokenToWalletFlow(reserveOrderId))
+            subFlow(TransferTokenToWalletFlow(reserveOrderId))
 
-        return subFlow(FinalityFlow(verifyAndSign(transaction(reserveOrderId)), listOf()))
+            subFlow(FinalityFlow(verifyAndSign(transaction(reserveOrderId)), listOf()))
+        } else {
+            throw IllegalArgumentException("This reserve order is already transferred at ${inputState(reserveOrderId).state.data.transferredAt}")
+        }
     }
 
     private fun inputState(reserveOrderId: String): StateAndRef<ReserveOrderState>

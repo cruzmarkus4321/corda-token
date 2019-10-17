@@ -31,9 +31,6 @@ class VerifyOrderFlow(private val orderId: String) : FlowFunctions()
         val otherPartySession = initiateFlow(stringToParty("Platform"))
         val transactionSignedByParties = subFlow(CollectSignaturesFlow(partialTx, listOf(otherPartySession)))
 
-        val reserveOrder = getOrderByLinearId(orderId).state.data
-        //val fungibleToken = reserveOrder.amount of TokenType("PHP") issuedBy ourIdentity heldBy ourIdentity
-
         return subFlow(FinalityFlow(transactionSignedByParties, listOf(otherPartySession)))
     }
 

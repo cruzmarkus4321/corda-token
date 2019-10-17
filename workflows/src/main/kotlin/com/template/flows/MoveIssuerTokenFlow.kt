@@ -1,6 +1,7 @@
 package com.template.flows
 
 import co.paralleluniverse.fibers.Suspendable
+import com.r3.corda.lib.tokens.contracts.states.FungibleToken
 import com.r3.corda.lib.tokens.contracts.utilities.of
 import com.r3.corda.lib.tokens.workflows.flows.move.MoveFungibleTokensFlow
 import com.r3.corda.lib.tokens.workflows.flows.move.MoveTokensFlowHandler
@@ -8,12 +9,15 @@ import com.r3.corda.lib.tokens.workflows.types.PartyAndAmount
 import com.r3.corda.lib.tokens.workflows.utilities.heldTokenAmountCriteria
 import com.template.functions.FlowFunctions
 import com.template.types.TokenType
+import net.corda.core.contracts.StateAndRef
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.FlowSession
 import net.corda.core.flows.InitiatedBy
 import net.corda.core.flows.InitiatingFlow
 import net.corda.core.identity.Party
+import net.corda.core.node.services.queryBy
 import net.corda.core.transactions.SignedTransaction
+import java.lang.IllegalArgumentException
 
 @InitiatingFlow
 class MoveIssuerTokenFlow(private val amount: Double,
@@ -31,12 +35,22 @@ class MoveIssuerTokenFlow(private val amount: Double,
             else -> throw IllegalStateException("Only the Issuers can issue tokens.")
         }
 
-        return subFlow(MoveFungibleTokensFlow(
-                partyAndAmount = PartyAndAmount(otherHolder, amount of TokenType(tokenIdentifier)),
-                queryCriteria = heldTokenAmountCriteria(TokenType(tokenIdentifier), holder),
-                participantSessions = listOf(holderSession, otherHolderSession),
-                observerSessions = emptyList<FlowSession>()
-        ))
+        return if(getTokenAmount(tokenIdentifier) >= amount){
+            subFlow(MoveFungibleTokensFlow(
+                    partyAndAmount = PartyAndAmount(otherHolder, amount of TokenType(tokenIdentifier)),
+                    queryCriteria = heldTokenAmountCriteria(TokenType(tokenIdentifier), holder),
+                    participantSessions = listOf(holderSession, otherHolderSession),
+                    observerSessions = emptyList<FlowSession>()
+            ))
+        } else {
+            throw IllegalArgumentException("Insufficient $tokenIdentifier.")
+        }
+    }
+
+    private fun getTokenAmount(currency: String) : Double
+    {
+        val queryCriteria = heldTokenAmountCriteria(com.template.types.TokenType(currency), holder = ourIdentity)
+        return serviceHub.vaultService.queryBy<FungibleToken>(queryCriteria).states.single().state.data.amount.quantity.toDouble()
     }
 }
 

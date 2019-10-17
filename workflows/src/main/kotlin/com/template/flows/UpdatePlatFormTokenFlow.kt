@@ -23,14 +23,18 @@ class UpdatePlatFormTokenFlow(private val reserveOrderId : String) : FlowFunctio
 {
     @Suspendable
     override fun call(): SignedTransaction {
-        return subFlow(
-            RedeemFungibleTokens(
-                amount = getReserveOrder().amount of output(getReserveOrder().currency).tokenType,
-                issuer = input(getReserveOrder().currency).state.data.issuer,
-                observers = listOf(),
-                queryCriteria = heldTokenAmountCriteria(com.template.types.TokenType(getReserveOrder().currency), holder = ourIdentity)
+        return if(input(getReserveOrder().currency).state.data.amount.quantity >= getReserveOrder().amount){
+            subFlow(
+                    RedeemFungibleTokens(
+                            amount = getReserveOrder().amount of output(getReserveOrder().currency).tokenType,
+                            issuer = input(getReserveOrder().currency).state.data.issuer,
+                            observers = listOf(),
+                            queryCriteria = heldTokenAmountCriteria(com.template.types.TokenType(getReserveOrder().currency), holder = ourIdentity)
+                    )
             )
-        )
+        } else {
+            throw IllegalArgumentException("Insufficient Platform Funds.")
+        }
     }
 
     private fun input(currency : String) : StateAndRef<FungibleToken>
