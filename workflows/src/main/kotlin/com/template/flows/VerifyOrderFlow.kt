@@ -19,6 +19,8 @@ import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
+import org.hibernate.criterion.Order
+import java.lang.IllegalStateException
 import java.time.Instant
 
 @InitiatingFlow
@@ -26,15 +28,21 @@ import java.time.Instant
 class VerifyOrderFlow(private val orderId: String) : FlowFunctions()
 {
     @Suspendable
-    override fun call(): SignedTransaction {
-        val partialTx = verifyAndSign(transaction())
-        val otherPartySession = initiateFlow(stringToParty("Platform"))
-        val transactionSignedByParties = subFlow(CollectSignaturesFlow(partialTx, listOf(otherPartySession)))
+    override fun call(): SignedTransaction
+    {
 
-        val reserveOrder = getOrderByLinearId(orderId).state.data
-        //val fungibleToken = reserveOrder.amount of TokenType("PHP") issuedBy ourIdentity heldBy ourIdentity
+        if(verifyBit())
+        {
+            val partialTx = verifyAndSign(transaction())
+            val otherPartySession = initiateFlow(stringToParty("Platform"))
+            val transactionSignedByParties = subFlow(CollectSignaturesFlow(partialTx, listOf(otherPartySession)))
 
-        return subFlow(FinalityFlow(transactionSignedByParties, listOf(otherPartySession)))
+            return subFlow(FinalityFlow(transactionSignedByParties, listOf(otherPartySession)))
+        }
+        else
+        {
+            throw IllegalStateException("Order has been already verified!")
+        }
     }
 
     private fun outputState() : OrderState
@@ -58,6 +66,20 @@ class VerifyOrderFlow(private val orderId: String) : FlowFunctions()
         return builder
     }
 
+    private fun orderStateRef() : StateAndRef<OrderState>
+    {
+        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(orderId)))
+        return serviceHub.vaultService.queryBy<OrderState>(queryCriteria).states.single()
+    }
+
+    private fun verifyBit() : Boolean
+    {
+        if(orderStateRef().state.data.verifiedAt != null)
+        {
+            return true
+        }
+        return false
+    }
 }
 
 @InitiatedBy(VerifyOrderFlow::class)
