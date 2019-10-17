@@ -73,7 +73,7 @@ class VerifyOrderFlow(private val orderId: String) : FlowFunctions()
 
     private fun verifyBit() : Boolean
     {
-        if(orderStateRef().state.data.verifiedAt != null)
+        if(orderStateRef().state.data.verifiedAt == null)
         {
             return true
         }
