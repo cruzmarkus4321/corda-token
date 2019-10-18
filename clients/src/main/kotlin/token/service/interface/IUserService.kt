@@ -4,5 +4,5 @@ import token.dto.user.RegisterUserFlowDTO
 import token.dto.user.UserDTO
 
 interface IUserService: IService{
-    fun registerUser(registerUserDTO: RegisterUserFlowDTO): UserDTO
+    fun registerUser(request: RegisterUserFlowDTO): UserDTO
 }
