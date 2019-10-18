@@ -7,6 +7,7 @@ import token.dto.order.SelfIssueTokenFlowDTO
 import token.dto.order.SendTokenFlowDTO
 import token.dto.order.VerifyOrderFlowDTO
 import token.service.IssuerService
+import java.net.URI
 import javax.validation.Valid
 
 private const val CONTROLLER_NAME = "api/v1/issuer"
@@ -53,7 +54,7 @@ class IssuerController(private val issuerService: IssuerService) : BaseControlle
     {
         return try {
             val response = issuerService.selfIssueToken(selfIssueToken)
-            ResponseEntity(HttpStatus.CREATED)
+            ResponseEntity.created(URI("/" + CONTROLLER_NAME + "/" + response.linearId)).body(response)
         } catch (e: Exception) {
             this.handleException(e)
         }
