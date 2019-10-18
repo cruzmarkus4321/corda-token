@@ -29,6 +29,7 @@ class IssuerService(private val rpc : NodeRPCConnection) : IIssuerService
     }
 
     override fun verifyOrder(verifyOrder : VerifyOrderFlowDTO) : Any {
+
         return rpc.proxy.startFlow(::VerifyOrderFlow, verifyOrder.orderId)
     }
 

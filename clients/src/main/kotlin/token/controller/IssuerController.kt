@@ -1,5 +1,6 @@
 package token.controller
 
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import token.dto.order.SelfIssueTokenFlowDTO
@@ -14,7 +15,7 @@ private const val CONTROLLER_NAME = "api/v1/issuer"
 @RequestMapping(CONTROLLER_NAME)
 class IssuerController(private val issuerService: IssuerService) : BaseController()
 {
-    @GetMapping(value = "/order/all", produces = ["application/json"])
+    @GetMapping(value = ["/order/all"], produces = ["application/json"])
     private fun getAllOrders() : ResponseEntity<Any>
     {
         return try {
@@ -25,7 +26,7 @@ class IssuerController(private val issuerService: IssuerService) : BaseControlle
         }
     }
 
-    @GetMapping(value = "/order/{orderId}")
+    @GetMapping(value = ["/order/{orderId}"], produces = ["application/json"])
     private fun getOrderById(@PathVariable orderId : String) : ResponseEntity<Any>
     {
         return try {
@@ -36,7 +37,7 @@ class IssuerController(private val issuerService: IssuerService) : BaseControlle
         }
     }
 
-    @PatchMapping(value = "/order/verify")
+    @PatchMapping(value = ["/order/verify"], produces = ["application/json"])
     private fun verifyOrder(@Valid @RequestBody verifyOrder : VerifyOrderFlowDTO) : ResponseEntity<Any>
     {
         return try {
@@ -47,18 +48,18 @@ class IssuerController(private val issuerService: IssuerService) : BaseControlle
         }
     }
 
-    @PostMapping(value = "/issue")
+    @PostMapping(value = ["/issue"], produces = ["application/json"])
     private fun selfIssueToken(@Valid @RequestBody selfIssueToken : SelfIssueTokenFlowDTO) : ResponseEntity<Any>
     {
         return try {
             val response = issuerService.selfIssueToken(selfIssueToken)
-            ResponseEntity.ok(response)
+            ResponseEntity(HttpStatus.CREATED)
         } catch (e: Exception) {
             this.handleException(e)
         }
     }
 
-    @PatchMapping(value = "/order/send")
+    @PatchMapping(value = ["/order/send"], produces = ["application/json"])
     private fun sendToken(@Valid @RequestBody sendToken : SendTokenFlowDTO) : ResponseEntity<Any>
     {
         return try {
