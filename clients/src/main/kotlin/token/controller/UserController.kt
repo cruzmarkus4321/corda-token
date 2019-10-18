@@ -48,10 +48,10 @@ class UserController (private val userService: IUserService): BaseController()
      * Add a user
      */
     @PostMapping(value = [], produces = ["application/json"])
-    private fun registerUser(@RequestBody registerUser: RegisterUserFlowDTO): ResponseEntity<Any>
+    private fun registerUser(@RequestBody request: RegisterUserFlowDTO): ResponseEntity<Any>
     {
         return try {
-            val response = userService.registerUser(registerUser)
+            val response = userService.registerUser(request)
             ResponseEntity.created(URI("/" + CONTROLLER_NAME + "/" + response.linearId)).body(response)
         } catch (e: Exception) {
             this.handleException(e)

@@ -28,13 +28,13 @@ class UserService (private val rpc: NodeRPCConnection, private val fhc: FlowHand
         return mapToUserDTO(userState.state.data)
     }
 
-    override fun registerUser(registerUserDTO: RegisterUserFlowDTO): UserDTO
+    override fun registerUser(request: RegisterUserFlowDTO): UserDTO
     {
         val flowReturn = rpc.proxy.startFlowDynamic(
                 RegisterUserFlow::class.java,
-                registerUserDTO.name,
-                registerUserDTO.amount,
-                registerUserDTO.currency
+                request.name,
+                request.amount,
+                request.currency
         )
         fhc.flowHandlerCompletion(flowReturn)
         val flowResult = flowReturn.returnValue.get().coreTransaction.outputStates.first() as UserState
