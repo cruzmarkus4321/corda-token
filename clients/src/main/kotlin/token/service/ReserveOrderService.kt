@@ -1,16 +1,14 @@
 package token.service
 
-import com.template.contracts.ReserveOrderContract
+import com.template.flows.platform.TransferTokenFlow
 import com.template.flows.user.ReserveOrderFlow
 import com.template.states.ReserveOrderState
-import com.template.states.UserState
-import net.corda.core.messaging.startFlow
 import org.springframework.stereotype.Service
 import token.common.appexceptions.NotFoundException
 import token.dto.reserveorder.ReserveOrderDTO
 import token.dto.reserveorder.ReserveOrderFlowDTO
+import token.dto.reserveorder.TransferReserveOrderFlowDTO
 import token.dto.reserveorder.mapToReserveOrderDTO
-import token.dto.user.mapToUserDTO
 import token.service.`interface`.IReserveOrderService
 import token.webserver.NodeRPCConnection
 import token.webserver.utilities.FlowHandlerCompletion
@@ -34,6 +32,16 @@ class ReserveOrderService(private val rpc: NodeRPCConnection, private val fhc: F
                 request.userId,
                 request.amount,
                 request.currency
+        )
+        fhc.flowHandlerCompletion(flowReturn)
+        val flowResult = flowReturn.returnValue.get().coreTransaction.outputStates.first() as ReserveOrderState
+        return mapToReserveOrderDTO(flowResult)
+    }
+
+    override fun transferToken(linearId: String): ReserveOrderDTO {
+        val flowReturn = rpc.proxy.startFlowDynamic(
+                TransferTokenFlow::class.java,
+                linearId
         )
         fhc.flowHandlerCompletion(flowReturn)
         val flowResult = flowReturn.returnValue.get().coreTransaction.outputStates.first() as ReserveOrderState

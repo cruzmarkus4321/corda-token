@@ -8,7 +8,7 @@ data class ReserveOrderDTO(
         val amount: Double,
         val currency: String,
         val orderedAt: String,
-        val transferredAt: String,
+        val transferredAt: String?,
         val linearId: String
 )
 
@@ -16,6 +16,10 @@ data class ReserveOrderFlowDTO @JsonCreator constructor(
         val userId: String,
         val amount: Double,
         val currency: String
+)
+
+data class TransferReserveOrderFlowDTO(
+        val reserveOrderId: String
 )
 
 fun mapToReserveOrderDTO(reserveOrder: ReserveOrderState): ReserveOrderDTO

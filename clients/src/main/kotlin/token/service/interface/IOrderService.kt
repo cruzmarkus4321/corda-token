@@ -1,5 +1,8 @@
 package token.service.`interface`
 
-interface IOrderService: IService {
+import token.dto.order.OrderDTO
+import token.dto.order.OrderFlowDTO
 
+interface IOrderService: IService {
+    fun addOrder(request: OrderFlowDTO): OrderDTO
 }

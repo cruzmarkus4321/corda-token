@@ -2,25 +2,24 @@ package token.controller
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import token.dto.user.RegisterUserFlowDTO
-import token.service.`interface`.IUserService
+import token.dto.order.OrderFlowDTO
+import token.service.`interface`.IOrderService
 import java.net.URI
 
-private const val CONTROLLER_NAME = "api/v1/users"
-
+private const val CONTROLLER_NAME = "api/v1/orders"
 @RestController
 @CrossOrigin(origins = ["*"])
 @RequestMapping(CONTROLLER_NAME)
-class UserController (private val userService: IUserService): BaseController()
+class OrderController(private val orderService: IOrderService) : BaseController()
 {
-     /**
+    /**
      * Get all users
      */
     @GetMapping(value = ["/all"], produces = ["application/json"])
-    private fun getAllUsers(): ResponseEntity<Any>
+    private fun getAllOrders() : ResponseEntity<Any>
     {
         return try {
-            val response = userService.getAll()
+            val response = orderService.getAll()
             ResponseEntity.ok(response)
         } catch (e: Exception) {
             this.handleException(e)
@@ -28,13 +27,13 @@ class UserController (private val userService: IUserService): BaseController()
     }
 
     /**
-    * Get a user using linearId
-    */
-    @GetMapping(value = ["/{userId}"], produces = ["application/json"])
-    private fun getUser(@PathVariable userId: String): ResponseEntity<Any>
+     * Get an order using linearId
+     */
+    @GetMapping(value = ["/{orderId}"], produces = ["application/json"])
+    private fun getOrderById(@PathVariable orderId : String) : ResponseEntity<Any>
     {
         return try {
-            val response = userService.get(userId)
+            val response = orderService.get(orderId)
             ResponseEntity.ok(response)
         } catch (e: Exception) {
             this.handleException(e)
@@ -42,13 +41,13 @@ class UserController (private val userService: IUserService): BaseController()
     }
 
     /**
-     * Add a user
+     * Add an order
      */
     @PostMapping(value = [], produces = ["application/json"])
-    private fun registerUser(@RequestBody request: RegisterUserFlowDTO): ResponseEntity<Any>
+    private fun addOrder(@RequestBody request : OrderFlowDTO) : ResponseEntity<Any>
     {
         return try {
-            val response = userService.registerUser(request)
+            val response = orderService.addOrder(request)
             ResponseEntity.created(URI("/" + CONTROLLER_NAME + "/" + response.linearId)).body(response)
         } catch (e: Exception) {
             this.handleException(e)

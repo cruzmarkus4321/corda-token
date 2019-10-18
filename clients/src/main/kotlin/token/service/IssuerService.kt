@@ -38,7 +38,7 @@ class IssuerService(private val rpc : NodeRPCConnection) : IIssuerService
 }
 
     override fun sendToken(SendToken : SendTokenFlowDTO) : Any{
-        return return rpc.proxy.startFlow(::SendTokenFlow, SendToken.orderId)
+        return rpc.proxy.startFlow(::SendTokenFlow, SendToken.orderId)
     }
 
 }
