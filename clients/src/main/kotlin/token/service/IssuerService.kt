@@ -1,13 +1,15 @@
 package token.service
 
+import com.r3.corda.lib.tokens.contracts.states.FungibleToken
 import com.template.flows.issuer.SelfIssueTokenFlow
 import com.template.flows.issuer.SendTokenFlow
 import com.template.flows.issuer.VerifyOrderFlow
 import com.template.states.OrderState
-import net.corda.core.messaging.startFlow
 import org.springframework.stereotype.Service
 import token.common.appexceptions.NotFoundException
 import token.dto.order.*
+import token.dto.token.TokenDTO
+import token.dto.token.mapToTokenDTO
 import token.service.`interface`.IIssuerService
 import token.webserver.NodeRPCConnection
 import token.webserver.utilities.FlowHandlerCompletion
@@ -22,7 +24,7 @@ class IssuerService(private val rpc : NodeRPCConnection, private val fhc : FlowH
 
     override fun getOrderById(orderId: String) : Any{
         val orderStateRef = rpc.proxy.vaultQuery(OrderState::class.java).states
-        val orderState = orderStateRef.find { it.state.data.linearId.toString() == orderId } ?: throw NotFoundException("User not found")
+        val orderState = orderStateRef.find { it.state.data.linearId.toString() == orderId } ?: throw NotFoundException("Order not found")
         return mapToOrderDTO(orderState.state.data)
     }
 
@@ -36,19 +38,18 @@ class IssuerService(private val rpc : NodeRPCConnection, private val fhc : FlowH
         return mapToOrderDTO(flowResult)
     }
 
-    override fun selfIssueToken(request: SelfIssueTokenFlowDTO) : OrderDTO {
+    override fun selfIssueToken(request: SelfIssueTokenFlowDTO) : TokenDTO {
         val flowReturn = rpc.proxy.startFlowDynamic(
                 SelfIssueTokenFlow::class.java,
                 request.amount
         )
         fhc.flowHandlerCompletion(flowReturn)
-        val flowResult = flowReturn.returnValue.get().coreTransaction.outputStates.first() as OrderState
-        return mapToOrderDTO(flowResult)
+        val flowResult = flowReturn.returnValue.get().coreTransaction.outputStates.first() as FungibleToken
+        return mapToTokenDTO(flowResult)
 }
-
     override fun sendToken(request : SendTokenFlowDTO) : OrderDTO{
         val flowReturn = rpc.proxy.startFlowDynamic(
-                SelfIssueTokenFlow::class.java,
+                SendTokenFlow::class.java,
                 request.orderId
         )
         fhc.flowHandlerCompletion(flowReturn)

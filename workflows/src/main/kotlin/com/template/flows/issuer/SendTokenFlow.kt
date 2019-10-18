@@ -25,14 +25,14 @@ class SendTokenFlow(private val orderId : String): FlowFunctions() {
         val otherPartySession = initiateFlow(stringToParty("Platform"))
         val transactionSignedByParties = subFlow(CollectSignaturesFlow(partialTx, listOf(otherPartySession)))
 
-        val orderStatus = inputState().state.data.status
-
-        return if(orderStatus == "VERIFIED") {
-            subFlow(MoveIssuerTokenFlow(inputState().state.data.amount, ourIdentity, stringToParty("Platform")))
-
-            subFlow(FinalityFlow(transactionSignedByParties, listOf(otherPartySession)))
-        } else {
-            throw IllegalArgumentException("Order must be verified first.")
+        return when (inputState().state.data.status) {
+            "PENDING" -> throw IllegalArgumentException("Order must be verified first!")
+            "COMPLETED" -> throw IllegalArgumentException("Order already completed!")
+            "VERIFIED" -> {
+                subFlow(MoveIssuerTokenFlow(inputState().state.data.amount, ourIdentity, stringToParty("Platform")))
+                subFlow(FinalityFlow(transactionSignedByParties, listOf(otherPartySession)))
+            }
+            else -> throw IllegalArgumentException("Order error!")
         }
     }
 

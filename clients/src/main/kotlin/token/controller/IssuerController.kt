@@ -1,11 +1,13 @@
 package token.controller
 
+import com.r3.corda.lib.tokens.contracts.states.FungibleToken
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import token.dto.order.SelfIssueTokenFlowDTO
 import token.dto.order.SendTokenFlowDTO
 import token.dto.order.VerifyOrderFlowDTO
+import token.dto.token.TokenDTO
 import token.service.IssuerService
 import java.net.URI
 import javax.validation.Valid
@@ -54,7 +56,7 @@ class IssuerController(private val issuerService: IssuerService) : BaseControlle
     {
         return try {
             val response = issuerService.selfIssueToken(selfIssueToken)
-            ResponseEntity.created(URI("/" + CONTROLLER_NAME + "/" + response.linearId)).body(response)
+            ResponseEntity.created(URI("/$CONTROLLER_NAME/$response")).body(response)
         } catch (e: Exception) {
             this.handleException(e)
         }

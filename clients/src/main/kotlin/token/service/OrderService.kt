@@ -10,12 +10,12 @@ import token.webserver.utilities.FlowHandlerCompletion
 @Service
 class OrderService(private val rpc: NodeRPCConnection, private val fhc: FlowHandlerCompletion): IOrderService{
     override fun getAll(): Any {
-        val orderStateRef = rpc.proxy.vaultQuery(OrderState::class.java).states
-        val
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun get(linearId: String): Any {
-        val orderStateRef = rpc.proxy.vaultQuery(OrderState::class.java).states
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
 
 }
