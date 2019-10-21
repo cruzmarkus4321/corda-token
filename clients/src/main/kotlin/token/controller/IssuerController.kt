@@ -40,8 +40,8 @@ class IssuerController(private val issuerService: IssuerService) : BaseControlle
         }
     }
 
-    @PatchMapping(value = ["/order/verify"], produces = ["application/json"])
-    private fun verifyOrder(@Valid @RequestBody verifyOrder : VerifyOrderFlowDTO) : ResponseEntity<Any>
+    @PatchMapping(value = ["/order/{verifyOrder}"], produces = ["application/json"])
+    private fun verifyOrder(@PathVariable verifyOrder : VerifyOrderFlowDTO) : ResponseEntity<Any>
     {
         return try {
             val response = issuerService.verifyOrder(verifyOrder)
@@ -62,7 +62,7 @@ class IssuerController(private val issuerService: IssuerService) : BaseControlle
         }
     }
 
-    @PatchMapping(value = ["/order/send"], produces = ["application/json"])
+    @PatchMapping(value = ["/order/transfer"], produces = ["application/json"])
     private fun sendToken(@Valid @RequestBody sendToken : SendTokenFlowDTO) : ResponseEntity<Any>
     {
         return try {

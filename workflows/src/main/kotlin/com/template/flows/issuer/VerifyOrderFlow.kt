@@ -21,7 +21,7 @@ class VerifyOrderFlow(private val orderId: String) : FlowFunctions()
     @Suspendable
     override fun call(): SignedTransaction
     {
-        if(verifyBit())
+        if(getStatus() == "PENDING")
         {
             val partialTx = verifyAndSign(transaction())
             val otherPartySession = initiateFlow(stringToParty("Platform"))
@@ -31,7 +31,7 @@ class VerifyOrderFlow(private val orderId: String) : FlowFunctions()
         }
         else
         {
-            throw FlowException("Order has been already verified!")
+            throw FlowException("Order has been already ${getStatus()}!")
         }
     }
 
@@ -56,14 +56,11 @@ class VerifyOrderFlow(private val orderId: String) : FlowFunctions()
         return builder
     }
 
-    private fun verifyBit() : Boolean
+    private fun getStatus() : String
     {
-        val orderStateRef = getOrderByLinearId(orderId)
-        if(orderStateRef.state.data.verifiedAt == null)
-        {
-            return true
-        }
-        return false
+        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(orderId)))
+        val orderStateRef = serviceHub.vaultService.queryBy<OrderState>(queryCriteria).states.single()
+        return orderStateRef.state.data.status
     }
 }
 
