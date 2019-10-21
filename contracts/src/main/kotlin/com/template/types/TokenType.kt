@@ -7,15 +7,4 @@ data class TokenType(
         override val fractionDigits: Int = 2
 ) : TokenType(tokenIdentifier, fractionDigits) {
     override fun toString(): String = tokenIdentifier
-
-    companion object {
-        private val registry = mapOf(
-                Pair("WIBBLE", ExampleFixedTokenType("WIBBLE", 2)),
-                Pair("WOBBLE", ExampleFixedTokenType("WIBBLE", 5))
-        )
-
-        fun getInstance(code: String): ExampleFixedTokenType {
-            return registry[code] ?: throw IllegalArgumentException("$code doesn't exist.")
-        }
-    }
 }

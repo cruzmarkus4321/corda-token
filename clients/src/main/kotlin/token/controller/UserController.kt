@@ -2,9 +2,11 @@ package token.controller
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import token.dto.platform.ReserveOrderFlowDTO
 import token.dto.user.RegisterUserFlowDTO
 import token.service.`interface`.IUserService
 import java.net.URI
+import javax.validation.Valid
 
 private const val CONTROLLER_NAME = "api/v1/users"
 
@@ -50,6 +52,20 @@ class UserController (private val userService: IUserService): BaseController()
         return try {
             val response = userService.registerUser(request)
             ResponseEntity.created(URI("/" + CONTROLLER_NAME + "/" + response.linearId)).body(response)
+        } catch (e: Exception) {
+            this.handleException(e)
+        }
+    }
+
+    /**
+     * Add a reserve order
+     */
+    @PostMapping(value = ["/reserveorder"], produces = ["application/json"])
+    private fun addReserveOrder(@Valid @RequestBody request: ReserveOrderFlowDTO): ResponseEntity<Any>
+    {
+        return try {
+            val response = userService.addReserveOrder(request)
+            ResponseEntity.created(URI("/$CONTROLLER_NAME/${response.linearId}")).body(response)
         } catch (e: Exception) {
             this.handleException(e)
         }

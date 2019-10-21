@@ -1,8 +1,8 @@
 package token.service.`interface`
 
-import token.dto.order.SelfIssueTokenFlowDTO
-import token.dto.order.SendTokenFlowDTO
-import token.dto.order.VerifyOrderFlowDTO
+import token.dto.platform.SelfIssueTokenFlowDTO
+import token.dto.platform.SendTokenFlowDTO
+import token.dto.platform.VerifyOrderFlowDTO
 
 interface IIssuerService {
     fun getAllOrder() : Any

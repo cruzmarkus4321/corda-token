@@ -4,9 +4,9 @@ import com.r3.corda.lib.tokens.contracts.states.FungibleToken
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import token.dto.order.SelfIssueTokenFlowDTO
-import token.dto.order.SendTokenFlowDTO
-import token.dto.order.VerifyOrderFlowDTO
+import token.dto.platform.SelfIssueTokenFlowDTO
+import token.dto.platform.SendTokenFlowDTO
+import token.dto.platform.VerifyOrderFlowDTO
 import token.dto.token.TokenDTO
 import token.service.IssuerService
 import java.net.URI
@@ -62,12 +62,12 @@ class IssuerController(private val issuerService: IssuerService) : BaseControlle
         }
     }
 
-    @PatchMapping(value = ["/order/transfer"], produces = ["application/json"])
+    @PostMapping(value = ["/order/transfer"], produces = ["application/json"])
     private fun sendToken(@Valid @RequestBody sendToken : SendTokenFlowDTO) : ResponseEntity<Any>
     {
         return try {
             val response = issuerService.sendToken(sendToken)
-            ResponseEntity.ok(response)
+            ResponseEntity.created(URI("/$CONTROLLER_NAME/${response.linearId}")).body(response)
         } catch (e: Exception) {
             this.handleException(e)
         }

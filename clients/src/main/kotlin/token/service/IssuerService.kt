@@ -7,7 +7,7 @@ import com.template.flows.issuer.VerifyOrderFlow
 import com.template.states.OrderState
 import org.springframework.stereotype.Service
 import token.common.appexceptions.NotFoundException
-import token.dto.order.*
+import token.dto.platform.*
 import token.dto.token.TokenDTO
 import token.dto.token.mapToTokenDTO
 import token.service.`interface`.IIssuerService

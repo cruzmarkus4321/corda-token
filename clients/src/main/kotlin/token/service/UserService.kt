@@ -1,10 +1,15 @@
 package token.service
 
 import com.template.flows.user.RegisterUserFlow
+import com.template.flows.user.ReserveOrderFlow
+import com.template.states.ReserveOrderState
 import com.template.states.UserState
 import net.corda.core.messaging.startFlow
 import org.springframework.stereotype.Service
 import token.common.appexceptions.NotFoundException
+import token.dto.platform.ReserveOrderDTO
+import token.dto.platform.ReserveOrderFlowDTO
+import token.dto.platform.mapToReserveOrderDTO
 import token.dto.user.RegisterUserFlowDTO
 import token.dto.user.UserDTO
 import token.dto.user.mapToUserDTO
@@ -13,7 +18,7 @@ import token.webserver.NodeRPCConnection
 import token.webserver.utilities.FlowHandlerCompletion
 
 @Service
-class UserService (private val rpc: NodeRPCConnection, private val fhc: FlowHandlerCompletion): IUserService
+class UserService(private val rpc: NodeRPCConnection, private val fhc: FlowHandlerCompletion): IUserService
 {
     override fun getAll(): Any
     {
@@ -41,5 +46,15 @@ class UserService (private val rpc: NodeRPCConnection, private val fhc: FlowHand
         return mapToUserDTO(flowResult)
     }
 
-    // TODO - service of reserve order flow
+    override fun addReserveOrder(request: ReserveOrderFlowDTO): ReserveOrderDTO {
+        val flowReturn = rpc.proxy.startFlowDynamic(
+                ReserveOrderFlow::class.java,
+                request.userId,
+                request.amount,
+                request.currency
+        )
+        fhc.flowHandlerCompletion(flowReturn)
+        val flowResult = flowReturn.returnValue.get().coreTransaction.outputStates.first() as ReserveOrderState
+        return mapToReserveOrderDTO(flowResult)
+    }
 }
