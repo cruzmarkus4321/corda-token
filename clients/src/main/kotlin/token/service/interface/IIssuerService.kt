@@ -7,7 +7,7 @@ import token.dto.order.VerifyOrderFlowDTO
 interface IIssuerService {
     fun getAllOrder() : Any
     fun getOrderById(orderId : String) : Any
-    fun verifyOrder(verifyOrder : VerifyOrderFlowDTO) : Any
-    fun selfIssueToken(SelfIssueToken : SelfIssueTokenFlowDTO) : Any
-    fun sendToken(SendToken : SendTokenFlowDTO) : Any
+    fun verifyOrder(request : VerifyOrderFlowDTO) : Any
+    fun selfIssueToken(request : SelfIssueTokenFlowDTO) : Any
+    fun sendToken(request : SendTokenFlowDTO) : Any
 }
