@@ -16,7 +16,6 @@ import net.corda.core.flows.InitiatingFlow
 import net.corda.core.identity.Party
 import net.corda.core.node.services.queryBy
 import net.corda.core.transactions.SignedTransaction
-import java.lang.IllegalArgumentException
 
 @InitiatingFlow
 class MoveIssuerTokenFlow(private val amount: Double,
