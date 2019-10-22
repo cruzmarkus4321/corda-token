@@ -33,17 +33,13 @@ class SelfIssueTokenFlow(private val amount: Double): FlowFunctions()
             else -> throw IllegalStateException("Only the Issuers can issue tokens.")
         }
 
-       // val fungibleToken = amount of TokenType(tokenIdentifier) issuedBy ourIdentity heldBy ourIdentity
-        //JOptionPane.showMessageDialog(null, newToken())
         val existingToken = getExistingToken()
         val newToken = newToken()
 
-        val token = getFungibleTokenUsingHolder(ourIdentity.name.organisation) ?: throw IllegalArgumentException("Fungible token not found!")
-
         return when {
 
-            existingToken.amount.toDecimal() == 0.toBigDecimal() -> subFlow(IssueTokensFlow(newToken(), listOf()))
-            existingToken.amount.toDecimal() > 0.toBigDecimal() -> {
+            existingToken.amount.toDecimal().toDouble() == 0.toDouble()  -> subFlow(IssueTokensFlow(newToken(), listOf()))
+            existingToken.amount.toDecimal().toDouble() > 0.toDouble() -> {
                 subFlow(IssueTokensFlow(newToken, listOf()))
                 subFlow(RedeemFungibleTokens(
                         amount = existingToken.amount.toDecimal() of existingToken.tokenType,
@@ -61,12 +57,12 @@ class SelfIssueTokenFlow(private val amount: Double): FlowFunctions()
         return fungibleTokenRef?.state?.data ?: 0 of TokenType(tokenIdentifier) issuedBy ourIdentity heldBy ourIdentity
     }
 
-    private fun getFungibleTokenUsingHolder(holder: String): StateAndRef<FungibleToken>? {
-        val criteria = QueryCriteria.VaultQueryCriteria()
-        return serviceHub.vaultService.queryBy<FungibleToken>(criteria = criteria).states.find {
-            it.state.data.holderString == holder
-        }
-    }
+//    private fun getFungibleTokenUsingHolder(holder: String): StateAndRef<FungibleToken>? {
+//        val criteria = QueryCriteria.VaultQueryCriteria()
+//        return serviceHub.vaultService.queryBy<FungibleToken>(criteria = criteria).states.find {
+//            it.state.data.holderString == holder
+//        }
+//    }
 
     private fun newToken() : FungibleToken
     {
