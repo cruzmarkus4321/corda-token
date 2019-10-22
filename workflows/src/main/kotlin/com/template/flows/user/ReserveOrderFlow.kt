@@ -27,7 +27,7 @@ class ReserveOrderFlow(private val userId: String,
     private fun outputState(): ReserveOrderState
     {
         return ReserveOrderState (
-                userId = userId,
+                userId = stringToUniqueIdentifier(userId),
                 amount = amount,
                 currency = currency,
                 orderedAt = Instant.now(),

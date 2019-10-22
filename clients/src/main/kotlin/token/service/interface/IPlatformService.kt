@@ -1,9 +1,6 @@
 package token.service.`interface`
 
-import token.dto.platform.OrderDTO
-import token.dto.platform.OrderFlowDTO
-import token.dto.platform.ReserveOrderDTO
-import token.dto.platform.TransferReserveOrderFlowDTO
+import token.dto.platform.*
 
 interface IPlatformService {
     fun getAllReserveOrders(): Any
@@ -11,5 +8,5 @@ interface IPlatformService {
     fun getAllOrders(): Any
     fun getOrder(linearId: String): Any
     fun addOrder(request: OrderFlowDTO): OrderDTO
-    fun transferToken(request: TransferReserveOrderFlowDTO): ReserveOrderDTO
+    fun transferToken(request: TransferReserveOrderFlowDTO): HistoryDTO
 }

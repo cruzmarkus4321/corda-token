@@ -20,26 +20,22 @@ class TransferTokenFlow(private val reserveOrderId: String): FlowFunctions(){
 
     @Suspendable
     override fun call(): SignedTransaction {
-        return if(inputState(reserveOrderId).state.data.transferredAt == null){
-            subFlow(UpdatePlatFormTokenFlow(reserveOrderId))
+        return if(getReserveOrderStateById(reserveOrderId).state.data.transferredAt == null){
+            subFlow(UpdatePlatformTokenFlow(reserveOrderId))
 
             subFlow(TransferTokenToWalletFlow(reserveOrderId))
 
             subFlow(FinalityFlow(verifyAndSign(transaction(reserveOrderId)), listOf()))
-        } else {
-            throw IllegalArgumentException("This reserve order is already transferred at ${inputState(reserveOrderId).state.data.transferredAt}")
-        }
-    }
 
-    private fun inputState(reserveOrderId: String): StateAndRef<ReserveOrderState>
-    {
-        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(reserveOrderId)))
-        return serviceHub.vaultService.queryBy<ReserveOrderState>(queryCriteria).states.single()
+            subFlow(RecordHistoryFlow(reserveOrderId))
+        } else {
+            throw IllegalArgumentException("This reserve order is already transferred at ${getReserveOrderStateById(reserveOrderId).state.data.transferredAt}")
+        }
     }
 
     private fun outputState(reserveOrderId: String): ReserveOrderState
     {
-        val reserveStateData = inputState(reserveOrderId).state.data
+        val reserveStateData = getReserveOrderStateById(reserveOrderId).state.data
 
         return reserveStateData.copy(transferredAt = Instant.now())
     }
@@ -48,7 +44,7 @@ class TransferTokenFlow(private val reserveOrderId: String): FlowFunctions(){
     {
         val cmd = Command(ReserveOrderContract.Commands.Transfer(), ourIdentity.owningKey)
         val builder = TransactionBuilder(getNotaries())
-                .addInputState(inputState(reserveOrderId))
+                .addInputState(getReserveOrderStateById(reserveOrderId))
                 .addCommand(cmd)
                 .addOutputState(outputState(reserveOrderId))
 

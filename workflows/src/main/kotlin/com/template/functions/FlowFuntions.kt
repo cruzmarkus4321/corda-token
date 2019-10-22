@@ -81,4 +81,14 @@ abstract class FlowFunctions : FlowLogic<SignedTransaction>()
         COMPLETED
     }
 
+    fun getOrderStateById(orderId: String): StateAndRef<OrderState>{
+        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(orderId)))
+        return serviceHub.vaultService.queryBy<OrderState>(queryCriteria).states.single()
+    }
+
+    fun getReserveOrderStateById(reserveOrderId: String): StateAndRef<ReserveOrderState>
+    {
+        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(reserveOrderId)))
+        return serviceHub.vaultService.queryBy<ReserveOrderState>(queryCriteria).states.single()
+    }
 }

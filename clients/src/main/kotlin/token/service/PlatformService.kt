@@ -2,6 +2,7 @@ package token.service
 
 import com.template.flows.platform.OrderFlow
 import com.template.flows.platform.TransferTokenFlow
+import com.template.states.HistoryState
 import com.template.states.OrderState
 import com.template.states.ReserveOrderState
 import javassist.NotFoundException
@@ -48,13 +49,13 @@ class PlatformService(private val rpc: NodeRPCConnection, private val fhc: FlowH
         return mapToReserveOrderDTO(reserveOrderState.state.data)
     }
 
-    override fun transferToken(request: TransferReserveOrderFlowDTO): ReserveOrderDTO {
+    override fun transferToken(request: TransferReserveOrderFlowDTO): HistoryDTO {
         val flowReturn = rpc.proxy.startFlowDynamic(
                 TransferTokenFlow::class.java,
                 request.reserveOrderId
         )
         fhc.flowHandlerCompletion(flowReturn)
-        val flowResult = flowReturn.returnValue.get().coreTransaction.outputStates.first() as ReserveOrderState
-        return mapToReserveOrderDTO(flowResult)
+        val flowResult = flowReturn.returnValue.get().coreTransaction.outputStates.first() as HistoryState
+        return mapToHistoryDTO(flowResult)
     }
 }
