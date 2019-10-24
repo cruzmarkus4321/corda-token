@@ -1,10 +1,9 @@
-package com.template.flows.platform
+package com.template.flows.user
 
 import co.paralleluniverse.fibers.Suspendable
 import com.r3.corda.lib.tokens.contracts.types.TokenType
 import com.r3.corda.lib.tokens.contracts.utilities.of
 import com.r3.corda.lib.tokens.workflows.utilities.getPreferredNotary
-import com.template.contracts.HistoryContract
 import com.template.contracts.UserContract
 import com.template.functions.FlowFunctions
 import com.template.states.UserState
@@ -24,7 +23,7 @@ class SendTokenToUserFlow(private val amount : Double,
     @Suspendable
     override fun call(): SignedTransaction {
 
-
+        subFlow(UpdateUserWalletFlow(senderUserId, amount, currency))
         return subFlow(FinalityFlow(verifyAndSign(transaction()), listOf()))
     }
 
@@ -47,7 +46,6 @@ class SendTokenToUserFlow(private val amount : Double,
         }
         return userState.copy(wallet = newWalletAmount)
     }
-
 
     private fun transaction() = TransactionBuilder(notary = getPreferredNotary(serviceHub)).apply {
         val cmd = Command(UserContract.Commands.Receive(), ourIdentity.owningKey)

@@ -18,6 +18,13 @@ data class RegisterUserFlowDTO @JsonCreator constructor(
         val currency: MutableList<String>
 )
 
+data class SendTokenToUserDTO @JsonCreator constructor(
+        val amount : Double,
+        val currency: String,
+        val senderUserId : String,
+        val receiverUserId : String
+)
+
 fun mapToUserDTO(user: UserState): UserDTO
 {
     return UserDTO(

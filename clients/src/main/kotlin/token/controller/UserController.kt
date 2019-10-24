@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import token.dto.platform.ReserveOrderFlowDTO
 import token.dto.user.RegisterUserFlowDTO
+import token.dto.user.SendTokenToUserDTO
 import token.service.`interface`.IUserService
 import java.net.URI
 import javax.validation.Valid
@@ -67,6 +68,17 @@ class UserController (private val userService: IUserService): BaseController()
             val response = userService.addReserveOrder(request)
             ResponseEntity.created(URI("/$CONTROLLER_NAME/${response.linearId}")).body(response)
         } catch (e: Exception) {
+            this.handleException(e)
+        }
+    }
+
+    @PutMapping(value = ["/sendtoken"], produces = ["application/json"])
+    private fun sendTokenToUser(@Valid @RequestBody request : SendTokenToUserDTO) : ResponseEntity<Any>
+    {
+        return try {
+            val response = userService.sendTokenToUser(request)
+            ResponseEntity.ok(response)
+        } catch (e : Exception) {
             this.handleException(e)
         }
     }
