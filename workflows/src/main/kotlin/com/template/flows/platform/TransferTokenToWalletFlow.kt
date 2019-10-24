@@ -21,23 +21,27 @@ class TransferTokenToWalletFlow(private val reserveOrderId: String): FlowFunctio
     override fun call(): SignedTransaction {
         return subFlow(FinalityFlow(verifyAndSign(transaction()), listOf()))
     }
+
     private fun reserveOrderStateRef() : StateAndRef<ReserveOrderState>
     {
         val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(reserveOrderId)))
         return serviceHub.vaultService.queryBy<ReserveOrderState>(queryCriteria).states.single()
     }
+
     private fun inputState() : StateAndRef<UserState>
     {
         val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(reserveOrderStateRef().state.data.userId))
         return serviceHub.vaultService.queryBy<UserState>(queryCriteria).states.single()
     }
+
     private fun outputState() : UserState
     {
         val amountInOrder = reserveOrderStateRef().state.data.amount.toInt()
         val currencyInOrder = reserveOrderStateRef().state.data.currency
-        val amountOrder : Amount<TokenType> = amountInOrder of TokenType(currencyInOrder, 2)
+        val amountOrder = amountInOrder of TokenType(currencyInOrder, 2)
         val wallet = inputState().state.data.wallet
         val newWalletAmount : MutableList<Amount<TokenType>> = mutableListOf()
+
         wallet.forEach {
             when(it.token.tokenIdentifier){
                 amountOrder.token.tokenIdentifier -> {
@@ -48,8 +52,10 @@ class TransferTokenToWalletFlow(private val reserveOrderId: String): FlowFunctio
                 }
             }
         }
+
         return inputState().state.data.copy(wallet = newWalletAmount)
     }
+
     private fun transaction() : TransactionBuilder
     {
         val builder = TransactionBuilder(getNotaries())

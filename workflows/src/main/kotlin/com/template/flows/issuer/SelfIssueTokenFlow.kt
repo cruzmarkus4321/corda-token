@@ -57,13 +57,6 @@ class SelfIssueTokenFlow(private val amount: Double): FlowFunctions()
         return fungibleTokenRef?.state?.data ?: 0 of TokenType(tokenIdentifier) issuedBy ourIdentity heldBy ourIdentity
     }
 
-//    private fun getFungibleTokenUsingHolder(holder: String): StateAndRef<FungibleToken>? {
-//        val criteria = QueryCriteria.VaultQueryCriteria()
-//        return serviceHub.vaultService.queryBy<FungibleToken>(criteria = criteria).states.find {
-//            it.state.data.holderString == holder
-//        }
-//    }
-
     private fun newToken() : FungibleToken
     {
         val existingToken = getExistingToken()

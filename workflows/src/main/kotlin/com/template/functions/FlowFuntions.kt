@@ -1,9 +1,11 @@
 package com.template.functions
 
+import com.google.gson.Gson
 import com.r3.corda.lib.tokens.contracts.utilities.of
 import com.r3.corda.lib.tokens.workflows.flows.move.MoveFungibleTokensFlow
 import com.r3.corda.lib.tokens.workflows.types.PartyAndAmount
 import com.r3.corda.lib.tokens.workflows.utilities.heldTokenAmountCriteria
+import com.template.flows.response.ApiResponse
 import com.template.states.OrderState
 import com.template.states.ReserveOrderState
 import com.template.states.UserState
@@ -21,6 +23,7 @@ import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
+import java.net.URL
 
 abstract class FlowFunctions : FlowLogic<SignedTransaction>()
 {
@@ -44,31 +47,6 @@ abstract class FlowFunctions : FlowLogic<SignedTransaction>()
         return UniqueIdentifier.fromString(id)
     }
 
-    fun inputStateViaLinearId(linearId: String) : StateAndRef<UserState>
-    {
-        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(linearId)))
-        return serviceHub.vaultService.queryBy<UserState>(queryCriteria).states.single()
-    }
-
-    fun getOrderByLinearId(linearId: String) : StateAndRef<OrderState>
-    {
-        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(linearId)), status = Vault.StateStatus.ALL)
-        return serviceHub.vaultService.queryBy<OrderState>(queryCriteria).states.single()
-    }
-
-    /*fun registerStateCountBit(): Boolean {
-        val count = serviceHub.vaultService.queryBy<UserState>().states.count()
-        return count != 0
-    }
-
-    fun requestStateStatusBit(requestlinearId: String) : Striung
-    {
-        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(requestlinearId)))
-        val requestState = serviceHub.vaultService.queryBy<UserState>(queryCriteria).states.single()
-
-        return requestState.state.data.
-    }*/
-
     fun getNotaries(): Party
     {
         return serviceHub.networkMapCache.notaryIdentities.first()
@@ -81,14 +59,29 @@ abstract class FlowFunctions : FlowLogic<SignedTransaction>()
         COMPLETED
     }
 
-    fun getOrderStateById(orderId: String): StateAndRef<OrderState>{
-        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(orderId)))
+    fun getUserStateByLinearId(userId: String): StateAndRef<UserState>{
+        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(userId)))
+        return serviceHub.vaultService.queryBy<UserState>(queryCriteria).states.single()
+    }
+
+    fun getOrderByLinearId(linearId: String) : StateAndRef<OrderState>
+    {
+        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(linearId)), status = Vault.StateStatus.ALL)
         return serviceHub.vaultService.queryBy<OrderState>(queryCriteria).states.single()
     }
 
-    fun getReserveOrderStateById(reserveOrderId: String): StateAndRef<ReserveOrderState>
+    fun getReserveOrderStateByLinearId(reserveOrderId: String): StateAndRef<ReserveOrderState>
     {
         val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(reserveOrderId)))
         return serviceHub.vaultService.queryBy<ReserveOrderState>(queryCriteria).states.single()
+    }
+
+    fun getPHPRate(): Double{
+        val response = URL("https://api.exchangeratesapi.io/latest?base=USD&symbols=PHP").readText()
+        val gson = Gson()
+
+        val apiResponse = gson.fromJson(response, ApiResponse::class.java)
+
+        return apiResponse.rates.php
     }
 }

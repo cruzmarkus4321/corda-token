@@ -3,7 +3,6 @@ package com.template.flows.platform
 import co.paralleluniverse.fibers.Suspendable
 import com.r3.corda.lib.tokens.workflows.utilities.getPreferredNotary
 import com.template.contracts.HistoryContract
-import com.template.contracts.UserContract
 import com.template.functions.FlowFunctions
 import com.template.states.HistoryState
 import net.corda.core.contracts.Command
@@ -20,7 +19,7 @@ class RecordHistoryFlow(private val reserveOrderId: String): FlowFunctions(){
 
     @Suspendable
     override fun call(): SignedTransaction {
-        tokenIssuer = when (getReserveOrderStateById(reserveOrderId).state.data.currency) {
+        tokenIssuer = when (getReserveOrderStateByLinearId(reserveOrderId).state.data.currency) {
             "PHP" -> "IssuerPHP"
             "USD" -> "IssuerUSD"
             else -> throw IllegalStateException("Unknown Issuer")
@@ -36,9 +35,9 @@ class RecordHistoryFlow(private val reserveOrderId: String): FlowFunctions(){
     private fun historyState(): HistoryState
     {
         return HistoryState(
-                amount = getReserveOrderStateById(reserveOrderId).state.data.amount,
-                currency = getReserveOrderStateById(reserveOrderId).state.data.currency,
-                userId = getReserveOrderStateById(reserveOrderId).state.data.userId,
+                amount = getReserveOrderStateByLinearId(reserveOrderId).state.data.amount,
+                currency = getReserveOrderStateByLinearId(reserveOrderId).state.data.currency,
+                userId = getReserveOrderStateByLinearId(reserveOrderId).state.data.userId,
                 transferredAt = Instant.now(),
                 linearId = UniqueIdentifier(),
                 participants = listOf(ourIdentity, stringToParty(tokenIssuer))

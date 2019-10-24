@@ -1,9 +1,11 @@
 package com.template.flows.user
 
+import com.google.gson.Gson
 import com.r3.corda.lib.tokens.contracts.types.TokenType
 import com.r3.corda.lib.tokens.contracts.utilities.of
 import com.r3.corda.lib.tokens.workflows.utilities.getPreferredNotary
 import com.template.contracts.UserContract
+import com.template.flows.response.ApiResponse
 import com.template.functions.FlowFunctions
 import com.template.states.UserState
 import net.corda.core.contracts.Amount
@@ -14,7 +16,10 @@ import net.corda.core.flows.StartableByRPC
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import java.lang.IllegalStateException
+import java.net.URL
+import java.nio.charset.Charset
 import java.time.Instant
+import javax.swing.JOptionPane
 
 @StartableByRPC
 class RegisterUserFlow(private val name: String,
