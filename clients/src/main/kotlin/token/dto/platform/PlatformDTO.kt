@@ -1,6 +1,7 @@
 package token.dto.platform
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.template.states.HistoryState
 import com.template.states.OrderState
 import com.template.states.ReserveOrderState
 
@@ -64,11 +65,30 @@ data class TransferReserveOrderFlowDTO @JsonCreator constructor(
 fun mapToReserveOrderDTO(reserveOrder: ReserveOrderState): ReserveOrderDTO
 {
     return ReserveOrderDTO(
-            userId = reserveOrder.userId,
+            userId = reserveOrder.userId.toString(),
             amount = reserveOrder.amount,
             currency = reserveOrder.currency,
             orderedAt = reserveOrder.orderedAt.toString(),
             transferredAt = reserveOrder.transferredAt.toString(),
             linearId = reserveOrder.linearId.toString()
+    )
+}
+
+data class HistoryDTO(
+        val amount: Double,
+        val currency: String,
+        val userId: String,
+        val transferredAt: String,
+        val linearId: String
+)
+
+fun mapToHistoryDTO(historyState: HistoryState): HistoryDTO
+{
+    return HistoryDTO(
+            amount = historyState.amount,
+            currency = historyState.currency,
+            userId = historyState.userId.toString(),
+            transferredAt = historyState.transferredAt.toString(),
+            linearId = historyState.linearId.toString()
     )
 }

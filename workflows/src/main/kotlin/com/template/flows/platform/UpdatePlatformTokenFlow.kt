@@ -15,7 +15,7 @@ import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 
-class UpdatePlatFormTokenFlow(private val reserveOrderId : String) : FlowFunctions()
+class UpdatePlatformTokenFlow(private val reserveOrderId : String) : FlowFunctions()
 {
     @Suspendable
     override fun call(): SignedTransaction {

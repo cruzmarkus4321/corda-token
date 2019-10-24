@@ -28,7 +28,7 @@ class TransferTokenToWalletFlow(private val reserveOrderId: String): FlowFunctio
     }
     private fun inputState() : StateAndRef<UserState>
     {
-        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(stringToUniqueIdentifier(reserveOrderStateRef().state.data.userId)))
+        val queryCriteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(reserveOrderStateRef().state.data.userId))
         return serviceHub.vaultService.queryBy<UserState>(queryCriteria).states.single()
     }
     private fun outputState() : UserState
