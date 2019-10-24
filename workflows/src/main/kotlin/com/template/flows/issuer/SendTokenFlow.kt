@@ -2,6 +2,7 @@ package com.template.flows.issuer
 
 import co.paralleluniverse.fibers.Suspendable
 import com.template.contracts.OrderContract
+import com.template.flows.platform.MergeFungibleTokenFlow
 import com.template.functions.FlowFunctions
 import com.template.states.OrderState
 import net.corda.core.contracts.Command
@@ -14,6 +15,7 @@ import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import java.lang.IllegalArgumentException
 import java.time.Instant
+import javax.swing.JOptionPane
 
 @InitiatingFlow
 @StartableByRPC
@@ -29,6 +31,7 @@ class SendTokenFlow(private val orderId : String): FlowFunctions() {
             "PENDING" -> throw IllegalArgumentException("Order must be verified first!")
             "COMPLETED" -> throw IllegalArgumentException("Order already completed!")
             "VERIFIED" -> {
+
                 subFlow(MoveIssuerTokenFlow(inputState().state.data.amount, ourIdentity, stringToParty("Platform")))
                 subFlow(FinalityFlow(transactionSignedByParties, listOf(otherPartySession)))
             }
@@ -69,7 +72,13 @@ class SendTokenFlowResponder(private val flowSession: FlowSession) : FlowFunctio
             override fun checkTransaction(stx: SignedTransaction) = requireThat {
             }
         })
-        
-        return subFlow(ReceiveFinalityFlow(flowSession))
+
+        return subFlow(ReceiveFinalityFlow(flowSession)).also {
+            when(flowSession.counterparty.name.organisation) {
+                "IssuerPHP" -> subFlow(MergeFungibleTokenFlow("PHP"))
+                "IssuerUSD" -> subFlow(MergeFungibleTokenFlow("USD"))
+                else -> throw IllegalArgumentException("Merge unavailable!")
+            }
+        }
     }
 }
