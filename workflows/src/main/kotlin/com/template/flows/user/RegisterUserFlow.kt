@@ -1,6 +1,7 @@
 package com.template.flows.user
 
-import com.google.gson.Gson
+
+import co.paralleluniverse.fibers.Suspendable
 import com.r3.corda.lib.tokens.contracts.types.TokenType
 import com.r3.corda.lib.tokens.contracts.utilities.of
 import com.r3.corda.lib.tokens.workflows.utilities.getPreferredNotary
@@ -26,6 +27,7 @@ class RegisterUserFlow(private val name: String,
                        private val amount: MutableList<Double>,
                        private val currency: MutableList<String>): FlowFunctions()
 {
+    @Suspendable
     override fun call(): SignedTransaction
     {
         if(ourIdentity.name.organisation == "Platform")
