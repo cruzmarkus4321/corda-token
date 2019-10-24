@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*
 import token.dto.platform.ReserveOrderFlowDTO
 import token.dto.user.ExchangeTokenFlowDTO
 import token.dto.user.RegisterUserFlowDTO
+import token.dto.user.SendTokenToUserDTO
 import token.service.`interface`.IUserService
 import java.net.URI
 import javax.validation.Valid
@@ -14,14 +15,12 @@ private const val CONTROLLER_NAME = "api/v1/users"
 @RestController
 @CrossOrigin(origins = ["*"])
 @RequestMapping(CONTROLLER_NAME)
-class UserController (private val userService: IUserService): BaseController()
-{
-     /**
+class UserController (private val userService: IUserService): BaseController() {
+    /**
      * Get all users
      */
     @GetMapping(value = ["/all"], produces = ["application/json"])
-    private fun getAllUsers(): ResponseEntity<Any>
-    {
+    private fun getAllUsers(): ResponseEntity<Any> {
         return try {
             val response = userService.getAll()
             ResponseEntity.ok(response)
@@ -31,11 +30,10 @@ class UserController (private val userService: IUserService): BaseController()
     }
 
     /**
-    * Get a user using linearId
-    */
+     * Get a user using linearId
+     */
     @GetMapping(value = ["/{userId}"], produces = ["application/json"])
-    private fun getUser(@PathVariable userId: String): ResponseEntity<Any>
-    {
+    private fun getUser(@PathVariable userId: String): ResponseEntity<Any> {
         return try {
             val response = userService.get(userId)
             ResponseEntity.ok(response)
@@ -48,8 +46,7 @@ class UserController (private val userService: IUserService): BaseController()
      * Add a user
      */
     @PostMapping(value = [], produces = ["application/json"])
-    private fun registerUser(@RequestBody request: RegisterUserFlowDTO): ResponseEntity<Any>
-    {
+    private fun registerUser(@RequestBody request: RegisterUserFlowDTO): ResponseEntity<Any> {
         return try {
             val response = userService.registerUser(request)
             ResponseEntity.created(URI("/" + CONTROLLER_NAME + "/" + response.linearId)).body(response)
@@ -62,8 +59,7 @@ class UserController (private val userService: IUserService): BaseController()
      * Add a reserve order
      */
     @PostMapping(value = ["/reserveorder"], produces = ["application/json"])
-    private fun addReserveOrder(@Valid @RequestBody request: ReserveOrderFlowDTO): ResponseEntity<Any>
-    {
+    private fun addReserveOrder(@Valid @RequestBody request: ReserveOrderFlowDTO): ResponseEntity<Any> {
         return try {
             val response = userService.addReserveOrder(request)
             ResponseEntity.created(URI("/$CONTROLLER_NAME/${response.linearId}")).body(response)
@@ -76,12 +72,21 @@ class UserController (private val userService: IUserService): BaseController()
      * Exchange token
      */
     @PostMapping(value = ["/exchange"], produces = ["application/json"])
-    private fun exchangeToken(@RequestBody request: ExchangeTokenFlowDTO): ResponseEntity<Any>
-    {
+    private fun exchangeToken(@RequestBody request: ExchangeTokenFlowDTO): ResponseEntity<Any> {
         return try {
             val response = userService.exchangeToken(request)
             ResponseEntity.created(URI("/$CONTROLLER_NAME/${response.linearId}")).body(response)
-        }catch (e: Exception) {
+        } catch (e: Exception) {
+            this.handleException(e)
+        }
+    }
+
+    @PutMapping(value = ["/sendtoken"], produces = ["application/json"])
+    private fun sendTokenToUser(@Valid @RequestBody request: SendTokenToUserDTO): ResponseEntity<Any> {
+        return try {
+            val response = userService.sendTokenToUser(request)
+            ResponseEntity.ok(response)
+        } catch (e: Exception) {
             this.handleException(e)
         }
     }
