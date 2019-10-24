@@ -92,3 +92,8 @@ fun mapToHistoryDTO(historyState: HistoryState): HistoryDTO
             linearId = historyState.linearId.toString()
     )
 }
+
+data class SelfIssuePlatformTokenFlowDTO @JsonCreator constructor(
+        val amount: Double,
+        val currency: String
+)

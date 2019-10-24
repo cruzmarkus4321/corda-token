@@ -1,25 +1,19 @@
 package com.template.flows.user
 
 import co.paralleluniverse.fibers.Suspendable
-import com.google.gson.Gson
 import com.r3.corda.lib.tokens.contracts.types.TokenType
 import com.r3.corda.lib.tokens.contracts.utilities.of
 import com.r3.corda.lib.tokens.workflows.utilities.getPreferredNotary
 import com.template.contracts.ExchangeContract
 import com.template.contracts.UserContract
-import com.template.flows.response.ApiResponse
 import com.template.functions.FlowFunctions
 import com.template.states.UserState
 import net.corda.core.contracts.Amount
 import net.corda.core.contracts.Command
-import net.corda.core.crypto.newSecureRandom
 import net.corda.core.flows.FinalityFlow
 import net.corda.core.flows.StartableByRPC
-import net.corda.core.serialization.CordaSerializable
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
-import java.net.URL
-import javax.swing.JOptionPane
 
 @StartableByRPC
 class ExchangeTokenFlow(private val userId: String,

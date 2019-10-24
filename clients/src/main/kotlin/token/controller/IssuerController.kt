@@ -62,6 +62,20 @@ class IssuerController(private val issuerService: IssuerService) : BaseControlle
         }
     }
 
+    /**
+     * Get all tokens
+     */
+    @GetMapping(value = ["/tokens"], produces = ["application/json"])
+    private fun getAllTokens() : ResponseEntity<Any>
+    {
+        return try {
+            val response = issuerService.getAllTokens()
+            ResponseEntity.ok(response)
+        } catch (e: Exception) {
+            this.handleException(e)
+        }
+    }
+
     @PostMapping(value = ["/order/transfer"], produces = ["application/json"])
     private fun sendToken(@Valid @RequestBody sendToken : SendTokenFlowDTO) : ResponseEntity<Any>
     {

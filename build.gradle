@@ -119,7 +119,7 @@ dependencies {
     cordapp "$tokens_release_group:tokens-workflows:$tokens_release_version"
     cordapp "$tokens_release_group:tokens-money:$tokens_release_version"
 
-    compile 'com.google.code.gson:gson:2.8.5'
+    compile 'org.slf4j:slf4j-api:1.7.25'
 }
 
 task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {

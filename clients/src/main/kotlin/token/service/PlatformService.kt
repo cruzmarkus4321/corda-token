@@ -1,6 +1,8 @@
 package token.service
 
+import com.r3.corda.lib.tokens.contracts.states.FungibleToken
 import com.template.flows.platform.OrderFlow
+import com.template.flows.platform.SelfIssuePlatformTokenFlow
 import com.template.flows.platform.TransferTokenFlow
 import com.template.states.HistoryState
 import com.template.states.OrderState
@@ -8,6 +10,8 @@ import com.template.states.ReserveOrderState
 import javassist.NotFoundException
 import org.springframework.stereotype.Service
 import token.dto.platform.*
+import token.dto.token.TokenDTO
+import token.dto.token.mapToTokenDTO
 import token.service.`interface`.IPlatformService
 import token.webserver.NodeRPCConnection
 import token.webserver.utilities.FlowHandlerCompletion
@@ -57,5 +61,21 @@ class PlatformService(private val rpc: NodeRPCConnection, private val fhc: FlowH
         fhc.flowHandlerCompletion(flowReturn)
         val flowResult = flowReturn.returnValue.get().coreTransaction.outputStates.first() as HistoryState
         return mapToHistoryDTO(flowResult)
+    }
+
+    override fun getAllTokens(): Any {
+        val fungibleTokenState = rpc.proxy.vaultQuery(FungibleToken::class.java).states
+        return fungibleTokenState.map { mapToTokenDTO(it.state.data) }
+    }
+
+    override fun selfIssuePlatformToken(request: SelfIssuePlatformTokenFlowDTO): TokenDTO {
+        val flowReturn = rpc.proxy.startFlowDynamic(
+                SelfIssuePlatformTokenFlow::class.java,
+                request.amount,
+                request.currency
+        )
+        fhc.flowHandlerCompletion(flowReturn)
+        val flowResult = flowReturn.returnValue.get().coreTransaction.outputStates.first() as FungibleToken
+        return mapToTokenDTO(flowResult)
     }
 }

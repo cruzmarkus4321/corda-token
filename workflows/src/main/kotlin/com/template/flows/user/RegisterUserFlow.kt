@@ -15,6 +15,7 @@ import net.corda.core.flows.StartableByRPC
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import java.time.Instant
+import javax.swing.JOptionPane
 
 @StartableByRPC
 class RegisterUserFlow(private val name: String,

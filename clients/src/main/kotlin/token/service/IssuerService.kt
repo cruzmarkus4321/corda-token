@@ -56,4 +56,9 @@ class IssuerService(private val rpc : NodeRPCConnection, private val fhc : FlowH
         val flowResult = flowReturn.returnValue.get().coreTransaction.outputStates.first() as OrderState
         return mapToOrderDTO(flowResult)
     }
+
+    override fun getAllTokens(): Any {
+        val fungibleTokenState = rpc.proxy.vaultQuery(FungibleToken::class.java).states
+        return fungibleTokenState.map { mapToTokenDTO(it.state.data) }
+    }
 }

@@ -1,7 +1,5 @@
 package com.template.functions
 
-import com.google.gson.Gson
-import com.template.flows.response.ApiResponse
 import com.template.states.OrderState
 import com.template.states.ReserveOrderState
 import com.template.states.UserState
@@ -15,7 +13,7 @@ import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
-import java.net.URL
+import khttp.get
 
 abstract class FlowFunctions : FlowLogic<SignedTransaction>()
 {
@@ -69,12 +67,9 @@ abstract class FlowFunctions : FlowLogic<SignedTransaction>()
     }
 
     fun getPHPRate(): Double{
-        val response = URL("https://api.exchangeratesapi.io/latest?base=USD&symbols=PHP").readText()
-        val gson = Gson()
+        val response = get("https://api.exchangeratesapi.io/latest?base=USD&symbols=PHP")
 
-        val apiResponse = gson.fromJson(response, ApiResponse::class.java)
-
-        return apiResponse.rates.php
+        return response.jsonObject.getJSONObject("rates").getDouble("PHP")
     }
 
     fun getOtherCurrency(currency: String): String{

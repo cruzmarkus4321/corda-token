@@ -27,3 +27,9 @@ fun mapToUserDTO(user: UserState): UserDTO
             linearId = user.linearId.toString()
     )
 }
+
+data class ExchangeTokenFlowDTO @JsonCreator constructor(
+        val userId: String,
+        val amount: Double,
+        val currency: String
+)

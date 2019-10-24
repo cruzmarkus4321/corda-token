@@ -1,5 +1,6 @@
 package token.service
 
+import com.template.flows.user.ExchangeTokenFlow
 import com.template.flows.user.RegisterUserFlow
 import com.template.flows.user.ReserveOrderFlow
 import com.template.states.ReserveOrderState
@@ -10,6 +11,7 @@ import token.common.appexceptions.NotFoundException
 import token.dto.platform.ReserveOrderDTO
 import token.dto.platform.ReserveOrderFlowDTO
 import token.dto.platform.mapToReserveOrderDTO
+import token.dto.user.ExchangeTokenFlowDTO
 import token.dto.user.RegisterUserFlowDTO
 import token.dto.user.UserDTO
 import token.dto.user.mapToUserDTO
@@ -56,5 +58,17 @@ class UserService(private val rpc: NodeRPCConnection, private val fhc: FlowHandl
         fhc.flowHandlerCompletion(flowReturn)
         val flowResult = flowReturn.returnValue.get().coreTransaction.outputStates.first() as ReserveOrderState
         return mapToReserveOrderDTO(flowResult)
+    }
+
+    override fun exchangeToken(request: ExchangeTokenFlowDTO): UserDTO {
+        val flowReturn = rpc.proxy.startFlowDynamic(
+                ExchangeTokenFlow::class.java,
+                request.userId,
+                request.amount,
+                request.currency
+        )
+        fhc.flowHandlerCompletion(flowReturn)
+        val flowResult = flowReturn.returnValue.get().coreTransaction.outputStates.first() as UserState
+        return mapToUserDTO(flowResult)
     }
 }

@@ -3,6 +3,7 @@ package token.controller
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import token.dto.platform.OrderFlowDTO
+import token.dto.platform.SelfIssuePlatformTokenFlowDTO
 import token.dto.platform.TransferReserveOrderFlowDTO
 
 import token.service.`interface`.IPlatformService
@@ -86,6 +87,20 @@ class OrderController(private val platformService: IPlatformService) : BaseContr
     }
 
     /**
+     * Get all tokens
+     */
+    @GetMapping(value = ["/tokens"], produces = ["application/json"])
+    private fun getAllTokens() : ResponseEntity<Any>
+    {
+        return try {
+            val response = platformService.getAllTokens()
+            ResponseEntity.ok(response)
+        } catch (e: Exception) {
+            this.handleException(e)
+        }
+    }
+
+    /**
      * Transfer token to User
      */
     @PostMapping(value = ["/transfer"], produces = ["application/json"])
@@ -94,6 +109,20 @@ class OrderController(private val platformService: IPlatformService) : BaseContr
         return try {
             val response = platformService.transferToken(request)
             ResponseEntity.created(URI("/$CONTROLLER_NAME/${response.linearId}")).body(response)
+        } catch (e: Exception) {
+            this.handleException(e)
+        }
+    }
+
+    /**
+     * Self issue platform token
+     */
+    @PostMapping(value = ["/issue"], produces = ["application/json"])
+    private fun issueToSelfToken(@RequestBody request: SelfIssuePlatformTokenFlowDTO): ResponseEntity<Any>
+    {
+        return try {
+            val response = platformService.selfIssuePlatformToken(request)
+            ResponseEntity.created(URI("/$CONTROLLER_NAME/$response")).body(response)
         } catch (e: Exception) {
             this.handleException(e)
         }

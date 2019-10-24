@@ -3,6 +3,7 @@ package token.controller
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import token.dto.platform.ReserveOrderFlowDTO
+import token.dto.user.ExchangeTokenFlowDTO
 import token.dto.user.RegisterUserFlowDTO
 import token.service.`interface`.IUserService
 import java.net.URI
@@ -67,6 +68,20 @@ class UserController (private val userService: IUserService): BaseController()
             val response = userService.addReserveOrder(request)
             ResponseEntity.created(URI("/$CONTROLLER_NAME/${response.linearId}")).body(response)
         } catch (e: Exception) {
+            this.handleException(e)
+        }
+    }
+
+    /**
+     * Exchange token
+     */
+    @PostMapping(value = ["/exchange"], produces = ["application/json"])
+    private fun exchangeToken(@RequestBody request: ExchangeTokenFlowDTO): ResponseEntity<Any>
+    {
+        return try {
+            val response = userService.exchangeToken(request)
+            ResponseEntity.created(URI("/$CONTROLLER_NAME/${response.linearId}")).body(response)
+        }catch (e: Exception) {
             this.handleException(e)
         }
     }
