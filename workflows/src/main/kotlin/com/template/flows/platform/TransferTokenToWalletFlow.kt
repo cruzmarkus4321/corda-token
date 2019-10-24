@@ -36,7 +36,7 @@ class TransferTokenToWalletFlow(private val reserveOrderId: String): FlowFunctio
 
     private fun outputState() : UserState
     {
-        val amountInOrder = reserveOrderStateRef().state.data.amount.toInt()
+        val amountInOrder = reserveOrderStateRef().state.data.amount.toDouble()
         val currencyInOrder = reserveOrderStateRef().state.data.currency
         val amountOrder = amountInOrder of TokenType(currencyInOrder, 2)
         val wallet = inputState().state.data.wallet

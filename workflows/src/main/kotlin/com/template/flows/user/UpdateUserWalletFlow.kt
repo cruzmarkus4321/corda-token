@@ -42,7 +42,7 @@ class UpdateUserWalletFlow(private val userId: String,
     }
 
     private fun transaction() = TransactionBuilder(notary = getPreferredNotary(serviceHub)).apply {
-        val cmd = Command(UserContract.Commands.Withdraw(), ourIdentity.owningKey)
+        val cmd = Command(UserContract.Commands.Send(), ourIdentity.owningKey)
         this.addInputState(getUserStateByLinearId(userId))
         this.addCommand(cmd)
         this.addOutputState(outUserState(), UserContract.id)
