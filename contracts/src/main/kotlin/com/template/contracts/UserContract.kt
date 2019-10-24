@@ -16,6 +16,7 @@ class UserContract: Contract{
     {
         class Add: TypeOnlyCommandData(), Commands
         class Receive: TypeOnlyCommandData(), Commands
+        class Withdraw: TypeOnlyCommandData(), Commands
     }
 
 }

@@ -1,21 +1,13 @@
 package com.template.functions
 
 import com.google.gson.Gson
-import com.r3.corda.lib.tokens.contracts.utilities.of
-import com.r3.corda.lib.tokens.workflows.flows.move.MoveFungibleTokensFlow
-import com.r3.corda.lib.tokens.workflows.types.PartyAndAmount
-import com.r3.corda.lib.tokens.workflows.utilities.heldTokenAmountCriteria
 import com.template.flows.response.ApiResponse
 import com.template.states.OrderState
 import com.template.states.ReserveOrderState
 import com.template.states.UserState
-import com.template.types.TokenType
-import net.corda.core.contracts.Contract
-import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.FlowLogic
-import net.corda.core.flows.FlowSession
 import net.corda.core.identity.Party
 import net.corda.core.node.services.Vault
 import net.corda.core.node.services.queryBy
@@ -83,5 +75,13 @@ abstract class FlowFunctions : FlowLogic<SignedTransaction>()
         val apiResponse = gson.fromJson(response, ApiResponse::class.java)
 
         return apiResponse.rates.php
+    }
+
+    fun getOtherCurrency(currency: String): String{
+        return when (currency) {
+            "PHP" -> "USD"
+            "USD" -> "PHP"
+            else -> throw IllegalArgumentException("Unsupported currency.")
+        }
     }
 }
