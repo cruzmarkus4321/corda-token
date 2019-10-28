@@ -15,7 +15,6 @@ import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import java.lang.IllegalArgumentException
 import java.time.Instant
-import javax.swing.JOptionPane
 
 @InitiatingFlow
 @StartableByRPC
@@ -72,6 +71,8 @@ class SendTokenFlowResponder(private val flowSession: FlowSession) : FlowFunctio
             override fun checkTransaction(stx: SignedTransaction) = requireThat {
             }
         })
+
+
 
         return subFlow(ReceiveFinalityFlow(flowSession)).also {
             when(flowSession.counterparty.name.organisation) {
