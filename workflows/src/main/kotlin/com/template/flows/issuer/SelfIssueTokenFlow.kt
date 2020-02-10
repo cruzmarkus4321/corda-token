@@ -25,7 +25,7 @@ class SelfIssueTokenFlow(private val amount: Double): FlowFunctions()
         tokenIdentifier = when (ourIdentity.name.organisation) {
             "IssuerPHP" -> "PHP"
             "IssuerUSD" -> "USD"
-            else -> throw IllegalStateException("Only the Issuers can issue tokens.")
+            else -> throw IllegalStateException("Only the Issuers can issue tokens.") as Throwable
         }
 
         val existingToken = getExistingToken()
